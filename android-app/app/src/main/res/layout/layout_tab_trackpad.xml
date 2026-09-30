@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_cockpit_depth"
+    android:paddingHorizontal="14dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="4dp">
+
+    <!-- Top Header Title & Air Mouse Toggle -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@drawable/ic_nav_trackpad"
+            app:tint="#00D2FF" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Touchpad &amp; Controls"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ultra-low latency pointer and input"
+                android:textColor="#6E829F"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Air Mouse Gyroscope Toggle Button -->
+        <LinearLayout
+            android:id="@+id/btnAirMouseToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:background="@drawable/card_pod_bg"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/ivAirMouseIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_telemetry_bars"
+                app:tint="#6E829F" />
+
+            <TextView
+                android:id="@+id/tvAirMouseStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="AIR MOUSE: OFF"
+                android:textColor="#8A9BB5"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Volume & Brightness Mini Control Sliders -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_glass_bg"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_marginBottom="10dp">
+
+        <!-- Volume Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_speaker_mute"
+                app:tint="#00D2FF"
+                android:layout_marginEnd="6dp" />
+
+            <SeekBar
+                android:id="@+id/sbVolume"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="65"
+                android:progressTint="#00D2FF"
+                android:thumbTint="#00D2FF" />
+
+            <TextView
+                android:id="@+id/tvVolumeVal"
+                android:layout_width="45dp"
+                android:layout_height="wrap_content"
+                android:text="65%"
+                android:textColor="#00D2FF"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+        </LinearLayout>
+
+        <!-- Brightness Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_bolt_ram"
+                app:tint="#FF9F0A"
+                android:layout_marginEnd="6dp" />
+
+            <SeekBar
+                android:id="@+id/sbBrightness"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="80"
+                android:progressTint="#FF9F0A"
+                android:thumbTint="#FF9F0A" />
+
+            <TextView
+                android:id="@+id/tvBrightnessVal"
+                android:layout_width="45dp"
+                android:layout_height="wrap_content"
+                android:text="80%"
+                android:textColor="#FF9F0A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:gravity="end" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Large Interactive Trackpad Surface -->
+    <com.pcmaster.mobile.TrackpadView
+        android:id="@+id/nativeTrackpad"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/trackpad_surface_bg"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Keyboard Special Keys Bar (Row 1: Primary Controls) -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="6dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/keyEsc"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="46dp"
+                android:text="ESC"
+                android:textSize="10.5sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyTab"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="46dp"
+                android:text="TAB"
+                android:textSize="10.5sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyWin"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="48dp"
+                android:text="⊞ WIN"
+                android:textSize="10.5sp"
+                android:textColor="#00D2FF"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyAltTab"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="54dp"
+                android:text="Alt+Tab"
+                android:textSize="10.5sp"
+                android:textColor="#00FF88"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyWinD"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="52dp"
+                android:text="Win+D"
+                android:textSize="10.5sp"
+                android:textColor="#FF9F0A"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyAltF4"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="52dp"
+                android:text="Alt+F4"
+                android:textSize="10.5sp"
+                android:textColor="#FF453A"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyEnter"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="55dp"
+                android:text="ENTER"
+                android:textSize="10.5sp"
+                android:textColor="#00FF88"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyBackspace"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="50dp"
+                android:text="⌫ DEL"
+                android:textSize="10.5sp"
+                android:textColor="#FF453A"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keySpace"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="55dp"
+                android:text="SPACE"
+                android:textSize="10.5sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyCopy"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="54dp"
+                android:text="Ctrl+C"
+                android:textSize="10.5sp"
+                android:textColor="#BF5AF2"
+                android:background="@drawable/key_btn_bg"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/keyPaste"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="54dp"
+                android:text="Ctrl+V"
+                android:textSize="10.5sp"
+                android:textColor="#BF5AF2"
+                android:background="@drawable/key_btn_bg" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Navigation & Toggle Bar (Row 2: Arrow Keys + F-Keys + Clipboard) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp">
+
+        <!-- Arrow Keys Mini D-Pad -->
+        <Button
+            android:id="@+id/keyArrowLeft"
+            android:layout_width="40dp"
+            android:layout_height="34dp"
+            android:text="◀"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/keyArrowUp"
+            android:layout_width="40dp"
+            android:layout_height="34dp"
+            android:text="▲"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/keyArrowDown"
+            android:layout_width="40dp"
+            android:layout_height="34dp"
+            android:text="▼"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="4dp" />
+
+        <Button
+            android:id="@+id/keyArrowRight"
+            android:layout_width="40dp"
+            android:layout_height="34dp"
+            android:text="▶"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="8dp" />
+
+        <!-- F-Keys Toggle Button -->
+        <Button
+            android:id="@+id/btnToggleFKeys"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="F1-F12 ▾"
+            android:textSize="10.5sp"
+            android:textStyle="bold"
+            android:textColor="#00D2FF"
+            android:background="@drawable/btn_scan_bg"
+            android:layout_marginEnd="6dp" />
+
+        <!-- Clipboard Sync Toggle Button -->
+        <Button
+            android:id="@+id/btnToggleClipboard"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="📋 SYNC"
+            android:textSize="10.5sp"
+            android:textStyle="bold"
+            android:textColor="#00FF88"
+            android:background="@drawable/btn_scan_bg" />
+    </LinearLayout>
+
+    <!-- Collapsible F1-F12 Keys Row -->
+    <HorizontalScrollView
+        android:id="@+id/layoutFKeys"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:visibility="gone"
+        android:layout_marginBottom="6dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button android:id="@+id/keyF1" android:layout_width="42dp" android:layout_height="34dp" android:text="F1" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF2" android:layout_width="42dp" android:layout_height="34dp" android:text="F2" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF3" android:layout_width="42dp" android:layout_height="34dp" android:text="F3" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF4" android:layout_width="42dp" android:layout_height="34dp" android:text="F4" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF5" android:layout_width="42dp" android:layout_height="34dp" android:text="F5" android:textSize="10sp" android:textColor="#00FF88" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF6" android:layout_width="42dp" android:layout_height="34dp" android:text="F6" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF7" android:layout_width="42dp" android:layout_height="34dp" android:text="F7" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF8" android:layout_width="42dp" android:layout_height="34dp" android:text="F8" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF9" android:layout_width="42dp" android:layout_height="34dp" android:text="F9" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF10" android:layout_width="44dp" android:layout_height="34dp" android:text="F10" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF11" android:layout_width="44dp" android:layout_height="34dp" android:text="F11" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" android:layout_marginEnd="4dp" />
+            <Button android:id="@+id/keyF12" android:layout_width="44dp" android:layout_height="34dp" android:text="F12" android:textSize="10sp" android:textColor="#FFFFFF" android:background="@drawable/key_btn_bg" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Collapsible Clipboard Control Bar -->
+    <LinearLayout
+        android:id="@+id/layoutClipboardBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:layout_marginBottom="6dp">
+
+        <Button
+            android:id="@+id/btnCopyFromPc"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="📥 Get PC Text"
+            android:textSize="10sp"
+            android:textColor="#00D2FF"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="5dp" />
+
+        <Button
+            android:id="@+id/btnSendToPcClipboard"
+            android:layout_width="0dp"
+            android:layout_height="34dp"
+            android:layout_weight="1"
+            android:text="📤 Send to PC"
+            android:textSize="10sp"
+            android:textColor="#00FF88"
+            android:background="@drawable/key_btn_bg"
+            android:layout_marginEnd="5dp" />
+
+        <Button
+            android:id="@+id/btnAutoClipboardToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:text="⚡ Auto: OFF"
+            android:textSize="10sp"
+            android:textColor="#8A9BB5"
+            android:background="@drawable/key_btn_bg"
+            android:paddingHorizontal="8dp" />
+    </LinearLayout>
+
+    <!-- Text Remote Send Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/etSendText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="Type text to send to PC..."
+            android:textColor="#FFFFFF"
+            android:textColorHint="#4A5F80"
+            android:background="@drawable/edittext_bg"
+            android:paddingHorizontal="12dp"
+            android:textSize="12.5sp"
+            android:singleLine="true" />
+
+        <Button
+            android:id="@+id/btnSendText"
+            android:layout_width="wrap_content"
+            android:minWidth="76dp"
+            android:layout_height="match_parent"
+            android:text="SEND"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="0dp"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:background="@drawable/btn_connect_bg"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

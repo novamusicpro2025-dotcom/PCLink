@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_pod_bg"
+    android:padding="16dp">
+
+    <!-- Dialog Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📖"
+            android:textSize="26sp"
+            android:layout_marginEnd="10dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How to Use PC Master"
+                android:textColor="#00D2FF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Complete Step-by-Step Feature Manual &amp; Guide"
+                android:textColor="#8B949E"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1F293D"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingEnd="4dp">
+
+            <!-- CHAPTER 1: PREREQUISITES -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📶 1. Prerequisites &amp; Network Setup"
+                    android:textColor="#00FF88"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Connect your Android phone and Windows PC to the SAME Wi-Fi network or Mobile Hotspot.\n• Launch the PC Master desktop application on your computer.\n• Check the IP Address (e.g., 192.168.1.5) and Port (8080) displayed on the PC app window."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 2: CONNECTING -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔗 2. Connecting Mobile to PC"
+                    android:textColor="#00D2FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Auto-Discovery: Tap '⚡ DISCOVER &amp; CONNECT' on the Dashboard to automatically find and connect to your PC in 1 second.\n• QR Code Scan: Tap '📷 SCAN QR CODE' and point your phone camera at the QR code shown on the PC screen.\n• Manual IP Entry: Type your PC's IP address into the IP box and tap 'CONNECT'.\n• Security: Authentication tokens are auto-negotiated automatically with zero typing required."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 3: LIVE SCREEN & TOUCH -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🖥️ 3. Live PC Screen &amp; Direct Touch Controls"
+                    android:textColor="#FFD600"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Switch to the MEDIA tab to view your PC screen in real time:\n• Single Tap: Left-clicks on PC at that exact screen coordinate.\n• Double Tap: Double-clicks to open files, folders, or launch desktop programs.\n• Long Press: Right-clicks to open Windows context menus.\n• Drag / Move: Smoothly slides the PC mouse cursor across your monitors in real time.\n• Quality Switcher: Tap the top badge to switch between 💎 1080p HD (Native PC resolution, 92% quality), 🔥 4K MAX (Ultra fidelity, 95% quality), and ⚡ 720p (High speed for congested Wi-Fi).\n• Fullscreen: Tap the fullscreen icon on the player for an edge-to-edge interactive touch monitor experience."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 4: COCKPIT QUICK CONTROLS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🪟 4. Cockpit Quick Bar &amp; Remote Typing"
+                    android:textColor="#FF6D00"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Located directly under the live PC screen:\n• 🔒 LOCK: Instantly locks Windows workstation (Win+L).\n• 🔓 UNLOCK: 1-Tap wakes PC screen, dismisses lock curtain, and enters saved PIN/password.\n• ☕ ANTI-IDLE: Keeps PC screen and display permanently awake (prevents screensaver &amp; sleep).\n• 🪟 WIN: Instantly toggles the Windows Start menu.\n• ⌨️ Quick Text Bar: Type words or commands into the box and tap 'SEND ➔' to type directly onto your PC screen!\n• ⌫ Backspace &amp; ↵ Enter: Delete characters or submit forms/terminal commands remotely.\n• 📋 CTRL+C &amp; 📄 CTRL+V: Instant clipboard copy and paste shortcuts.\n• ▲ UP &amp; ▼ DN: Smooth vertical page and document scrolling.\n• 🌓 B&amp;W / COLOR: Instant high-contrast monochrome mode toggle."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 5: PHONE SCREEN CAST TO PC -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📱 5. Phone Screen Cast to PC"
+                    android:textColor="#00E5FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mirror your smartphone display onto your computer monitor:\n• Go to MEDIA tab and scroll to 'Phone Screen Cast to PC'.\n• Tap 'START'.\n• Grant Android system screen recording permission by selecting 'Entire screen' and tapping 'Start'.\n• Your phone screen will stream live onto your PC Master desktop window!\n• Tap 'STOP' anytime to cleanly terminate the casting session."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 6: DASHBOARD & POWER -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📊 6. Dashboard Telemetry &amp; Power Controls"
+                    android:textColor="#B388FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Real-Time Telemetry: Inspect PC CPU usage %, RAM utilization, GPU stats &amp; temperature, and Battery/Charging level.\n• 🔒 Lock PC: Lock your workstation immediately from your phone.\n• 🔓 Unlock PC: Wake screen from sleep and auto-login with remembered PIN (long-press to edit PIN).\n• ☕ Anti-Idle Mode: Prevents PC monitor and sleep timeout so the computer stays actively awake during long downloads, tasks, or presentations.\n• Audio &amp; Display: Control Windows Master Volume with the slider, tap Mute, and adjust Screen Brightness.\n• Power Controls: Safely Trigger Sleep, Restart, Shutdown, or RAM Boost."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 7: TRACKPAD & KEYBOARD -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🖱️ 7. Wireless Trackpad &amp; Full Keyboard"
+                    android:textColor="#00FF88"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Switch to TRACKPAD tab for a large, responsive glass touchpad with smooth cursor acceleration.\n• Left Click &amp; Right Click buttons at the bottom.\n• Two-finger drag on the surface to scroll.\n• Tap the Keyboard icon to open the virtual keyboard with special keys: F1-F12, Esc, Win, Alt, Ctrl, Tab, and Arrow keys."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 8: FILE TRANSFER -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📁 8. Wireless File Manager &amp; Explorer"
+                    android:textColor="#00D2FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Switch to FILES tab to browse all PC drives (C:, D:, etc.) and directories in real time.\n• Download to Phone: Tap any file on the PC to download it wirelessly over LAN directly to your phone's Downloads folder.\n• Upload to PC: Tap 'Upload' to pick documents, photos, or files from your phone and send them directly to your PC."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 9: MEDIA CONTROLLER -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎵 9. Media Playback Controller"
+                    android:textColor="#FF4081"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Remotely control media players including Spotify, YouTube, VLC, Netflix, and browser video players.\n• Supported Controls: Play / Pause, Next Track, Previous Track, Volume Up, Volume Down, and Audio Mute."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- CHAPTER 10: TROUBLESHOOTING -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛠️ 10. Troubleshooting &amp; FAQs"
+                    android:textColor="#FF5252"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Windows Firewall: If connection fails, make sure Windows Defender Firewall allows incoming connections for PC Master on Port 8080 (TCP).\n• Router AP Isolation: Public, university, or office Wi-Fi networks often enable 'AP Client Isolation' which prevents devices from talking to each other. Fix: Turn on your phone's Mobile Hotspot, connect your PC to it, and connect seamlessly!\n• IP Change: If your PC restarts and gets a new Wi-Fi IP, simply tap '⚡ DISCOVER &amp; CONNECT' to re-bind instantly."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Close Button -->
+    <Button
+        android:id="@+id/btnHowToUseClose"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="✕ CLOSE GUIDE"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:background="@drawable/btn_connect_bg"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

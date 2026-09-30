@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">PC Master Control</string>
+    <string name="usb_help">USB CONNECTION HELP</string>
+    <string name="remote_control">REMOTE CONTROL</string>
+    <string name="vol_up">VOL +</string>
+    <string name="vol_down">VOL -</string>
+    <string name="mute">MUTE</string>
+    <string name="lock_pc">LOCK PC</string>
+    <string name="disconnect">DISCONNECT</string>
+</resources>

@@ -1,0 +1,1877 @@
+<Window x:Class="PcClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="PC Master - Cockpit Control Center" Height="720" Width="1100"
+        Icon="pcmaster.ico"
+        MinHeight="540" MinWidth="420"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Normal"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="CanResizeWithGrip"
+        Background="Transparent"
+        Loaded="Window_Loaded"
+        AllowDrop="True"
+        Drop="FilesPanel_Drop"
+        DragOver="FilesPanel_DragOver">
+
+    <Window.Resources>
+        <!-- === MOBILE DARK COCKPIT THEME PALETTE === -->
+        <SolidColorBrush x:Key="MainBg" Color="#050A14"/>
+        <SolidColorBrush x:Key="SidebarBg" Color="#07101F"/>
+        <SolidColorBrush x:Key="CardBg" Color="#0B1528"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#1A2D4A"/>
+        <SolidColorBrush x:Key="TextMain" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TextDim" Color="#8A9BB5"/>
+        <SolidColorBrush x:Key="TextDeepDim" Color="#4A5F80"/>
+
+        <!-- Cyber Neon Accents matching Mobile App -->
+        <SolidColorBrush x:Key="AccentBlue" Color="#00D2FF"/>
+        <SolidColorBrush x:Key="AccentPurple" Color="#BF5AF2"/>
+        <SolidColorBrush x:Key="AccentGreen" Color="#00FF88"/>
+        <SolidColorBrush x:Key="AccentOrange" Color="#FF9F0A"/>
+        <SolidColorBrush x:Key="AccentRed" Color="#FF453A"/>
+        <SolidColorBrush x:Key="AccentPink" Color="#FF5E7E"/>
+
+        <!-- Pod Card Border Gradient -->
+        <LinearGradientBrush x:Key="GlassBorder" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#4000D2FF" Offset="0"/>
+            <GradientStop Color="#1A2D4A" Offset="0.45"/>
+            <GradientStop Color="#25162744" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Specular Highlight Top Edge -->
+        <LinearGradientBrush x:Key="GlassTopSpecular" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#1A00D2FF" Offset="0"/>
+            <GradientStop Color="#3300D2FF" Offset="0.5"/>
+            <GradientStop Color="#1A00D2FF" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Cockpit Pod Card Fill -->
+        <LinearGradientBrush x:Key="GlassFill" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#EA0E1A30" Offset="0"/>
+            <GradientStop Color="#F0091325" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Sidebar Deep Surface Fill -->
+        <LinearGradientBrush x:Key="SidebarGlass" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#F507101F" Offset="0"/>
+            <GradientStop Color="#EA050A14" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="NeonBtnGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00D2FF" Offset="0"/>
+            <GradientStop Color="#0077B6" Offset="1"/>
+        </LinearGradientBrush>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- Cockpit Sidebar Button Style -->
+        <Style x:Key="SidebarBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#8A9BB5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Margin" Value="8,2"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="12" SnapsToDevicePixels="True" BorderThickness="1" BorderBrush="Transparent">
+                            <ContentPresenter VerticalAlignment="Center" Margin="8,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#15243C"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#1A2D4A"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Selected">
+                                <Setter TargetName="border" Property="Background" Value="#162640"/>
+                                <Setter Property="Foreground" Value="#00D2FF"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#4000D2FF"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="1"/>
+                                <Setter TargetName="border" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="16" Color="#00D2FF" Opacity="0.3" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Panel Entrance Animation Style -->
+        <Style x:Key="PanelStyle" TargetType="Grid">
+            <Setter Property="Opacity" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.35"/>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)" From="15" To="0" Duration="0:0:0.35">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Mobile Cockpit Card Pod Style -->
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource GlassFill}"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="22" Color="#000000" ShadowDepth="2" Opacity="0.55"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Cockpit Switch / Flat Toggle -->
+        <Style x:Key="FlatToggle" TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="bg" Width="46" Height="24" Background="#0E1A30" CornerRadius="12" BorderBrush="#1A2D4A" BorderThickness="1">
+                            <Ellipse x:Name="dot" Width="18" Height="18" Fill="#4A5F80" HorizontalAlignment="Left" Margin="3,0">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform x:Name="dotTransform" X="0"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="{StaticResource AccentBlue}"/>
+                                <Setter TargetName="bg" Property="BorderBrush" Value="{StaticResource AccentBlue}"/>
+                                <Setter TargetName="dot" Property="Fill" Value="#050A14"/>
+                                <Setter TargetName="bg" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="14" Color="#00D2FF" ShadowDepth="0" Opacity="0.6"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="dot" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="22" Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="dot" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" To="0" Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Cockpit Slider Style -->
+        <Style x:Key="GlassSlider" TargetType="Slider">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <Border x:Name="TrackBackground" Height="5" Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="0.8" CornerRadius="2.5" VerticalAlignment="Center" Margin="5,0"/>
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Background="Transparent" BorderThickness="0">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="5" Background="{StaticResource AccentBlue}" CornerRadius="2.5"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Grid>
+                                                    <Ellipse Width="18" Height="18" Fill="#00D2FF" Stroke="#FFFFFF" StrokeThickness="1.5">
+                                                        <Ellipse.Effect>
+                                                            <DropShadowEffect BlurRadius="12" Color="#00D2FF" Opacity="0.7" ShadowDepth="0"/>
+                                                        </Ellipse.Effect>
+                                                    </Ellipse>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Tactile Cockpit Button -->
+        <Style x:Key="NeonBtn" TargetType="Button">
+            <Setter Property="Background" Value="#101C30"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#1A2D4A"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBg" Background="{TemplateBinding Background}" CornerRadius="10"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBg" Property="Background" Value="#182C4E"/>
+                                <Setter TargetName="btnBg" Property="BorderBrush" Value="#00D2FF"/>
+                                <Setter Property="Foreground" Value="#00D2FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBg" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Outer Window Cockpit Container -->
+    <Border CornerRadius="24" MouseLeftButtonDown="Window_MouseLeftButtonDown" ClipToBounds="True" BorderThickness="1.2">
+        <Border.Background>
+            <SolidColorBrush Color="#050A14"/>
+        </Border.Background>
+        <Border.BorderBrush>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#4000D2FF" Offset="0"/>
+                <GradientStop Color="#1A2D4A" Offset="0.4"/>
+                <GradientStop Color="#25BF5AF2" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.BorderBrush>
+
+        <Grid>
+            <!-- High-Performance Ambient Cockpit Background Gradients (0% CPU overhead, 120 FPS Smooth) -->
+            <Grid x:Name="BackgroundMeshGrid" Opacity="0.75" IsHitTestVisible="False">
+                <Border HorizontalAlignment="Left" VerticalAlignment="Top" Width="750" Height="600" Margin="-150,-150,0,0">
+                    <Border.Background>
+                        <RadialGradientBrush Center="0.35,0.35" RadiusX="0.65" RadiusY="0.65">
+                            <GradientStop Color="#1800D2FF" Offset="0"/>
+                            <GradientStop Color="#0700D2FF" Offset="0.45"/>
+                            <GradientStop Color="Transparent" Offset="0.85"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+                <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="750" Height="600" Margin="0,0,-150,-150">
+                    <Border.Background>
+                        <RadialGradientBrush Center="0.65,0.65" RadiusX="0.65" RadiusY="0.65">
+                            <GradientStop Color="#15BF5AF2" Offset="0"/>
+                            <GradientStop Color="#05BF5AF2" Offset="0.45"/>
+                            <GradientStop Color="Transparent" Offset="0.85"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+                <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="550" Height="400">
+                    <Border.Background>
+                        <RadialGradientBrush Center="0.5,0.5" RadiusX="0.6" RadiusY="0.6">
+                            <GradientStop Color="#0C00FF88" Offset="0"/>
+                            <GradientStop Color="Transparent" Offset="0.7"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Grid>
+
+            <!-- Master Gaming Mode Glow Overlay -->
+            <Border x:Name="HyperGlowOverlay" Opacity="0" IsHitTestVisible="False" CornerRadius="24">
+                <Border.Background>
+                    <RadialGradientBrush Center="0.5,0.5" RadiusX="0.7" RadiusY="0.7">
+                        <GradientStop Color="#20BF5AF2" Offset="0"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </RadialGradientBrush>
+                </Border.Background>
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#9000D2FF" Offset="0"/>
+                        <GradientStop Color="Transparent" Offset="0.5"/>
+                        <GradientStop Color="#90BF5AF2" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+                <Border.BorderThickness>2.5</Border.BorderThickness>
+            </Border>
+
+            <!-- Main Full UI Grid -->
+            <Grid x:Name="FullUIGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="210"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Sidebar Navigation Dock -->
+                <Border Grid.Column="0" Background="{StaticResource SidebarGlass}" BorderBrush="#162744" BorderThickness="0,0,1,0" CornerRadius="24,0,0,24">
+                    <Grid Margin="0,15,0,12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Brand Logo -->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="14,0,14,16" HorizontalAlignment="Center">
+                            <Border Width="38" Height="38" CornerRadius="12">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#00D2FF" Offset="0"/>
+                                        <GradientStop Color="#BF5AF2" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="16" Color="#00D2FF" ShadowDepth="0" Opacity="0.5"/>
+                                </Border.Effect>
+                                <TextBlock Text="PC" Foreground="White" FontSize="15" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock Text="PC MASTER" Foreground="White" FontSize="15" FontWeight="Black"/>
+                                <TextBlock Text="COCKPIT OS | MOBILE LINKED" Foreground="{StaticResource AccentBlue}" FontSize="8.5" FontWeight="Bold"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Navigation Items -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel>
+                                <Button x:Name="NavDashboard" Style="{StaticResource SidebarBtn}" Tag="Selected" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F4CA;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Dashboard" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavMirror" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F4F1;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Liquid Mirror" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavFiles" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F4C1;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="AirDrop Files" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavRemote" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F680;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="App Library" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavMacros" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x26A1;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Pro Optimizer" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavMedia" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F3B5;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Media Studio" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavNotifications" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                             <ColumnDefinition Width="Auto"/>
+                                             <ColumnDefinition Width="*"/>
+                                             <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="&#x1F514;" FontSize="14" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1" Text="Notifications" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                        <Border Grid.Column="2" x:Name="NotifBadgeBorder" Background="#FF453A" CornerRadius="8" Padding="6,1" Margin="4,0,0,0" Visibility="Collapsed" VerticalAlignment="Center">
+                                            <TextBlock x:Name="NotifBadgeCount" Text="0" Foreground="White" FontSize="9.5" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                </Button>
+
+                                <Button x:Name="NavSystem" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x2699;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Hardware &amp; Power" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button x:Name="NavSettings" Style="{StaticResource SidebarBtn}" Click="NavBtn_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#x1F6E0;" FontSize="15" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Preferences" VerticalAlignment="Center" FontSize="13.5" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Bottom Companion Quick Pod -->
+                        <Border Grid.Row="2" CornerRadius="14" Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" Margin="10,8,10,0" Padding="10,8">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="&#x1F4F1;" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="PHONE HUB" Foreground="{StaticResource TextDim}" FontSize="9.5" FontWeight="Bold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Border HorizontalAlignment="Right" Background="#1800D2FF" CornerRadius="8" Padding="6,1">
+                                        <TextBlock Text="ACTIVE" Foreground="{StaticResource AccentBlue}" FontSize="8.5" FontWeight="Bold"/>
+                                    </Border>
+                                </Grid>
+                                <UniformGrid Columns="4">
+                                    <Button Content="&#x1F4F1;" ToolTip="Liquid Mirror" Click="NavBtn_Click" Tag="{Binding ElementName=NavMirror}" Style="{StaticResource NeonBtn}" Padding="2,4" Margin="1.5" FontSize="11"/>
+                                    <Button Content="&#x1F512;" ToolTip="Lock PC" Click="RemoteCmd_Click" Tag="lock" Style="{StaticResource NeonBtn}" Padding="2,4" Margin="1.5" FontSize="11"/>
+                                    <Button Content="&#x1F507;" ToolTip="Mute Audio" Click="RemoteCmd_Click" Tag="mute" Style="{StaticResource NeonBtn}" Padding="2,4" Margin="1.5" FontSize="11"/>
+                                    <Button Content="&#x26A1;" ToolTip="RAM Boost" Click="Macro_Click" Tag="boostram" Style="{StaticResource NeonBtn}" Padding="2,4" Margin="1.5" FontSize="11"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Main Content ScrollViewer -->
+                <ScrollViewer x:Name="MainContentScrollViewer" Grid.Column="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              CanContentScroll="False"
+                              PanningMode="VerticalOnly"
+                              PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                    <Grid Margin="18">
+
+                        <!-- ============================================== -->
+                        <!-- 1. DASHBOARD PANEL (Liquid Mirror Glass) -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="DashboardPanel" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Mobile Dynamic Island Cockpit Top Bar (Row 0) -->
+                            <Border Grid.Row="0" CornerRadius="18" Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" Padding="14,10" Margin="0,0,0,18">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="22" Color="#000000" ShadowDepth="2" Opacity="0.5"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Left: PC Master Brand & Pulse -->
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="36" Height="36" CornerRadius="12" BorderBrush="#1A2D4A" BorderThickness="1" Margin="0,0,12,0">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#2500D2FF" Offset="0"/>
+                                                    <GradientStop Color="#25BF5AF2" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <TextBlock Text="&#x26A1;" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="PC MASTER" FontSize="16" FontWeight="Black">
+                                                <TextBlock.Foreground>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                        <GradientStop Color="#00D2FF" Offset="0"/>
+                                                        <GradientStop Color="#BF5AF2" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </TextBlock.Foreground>
+                                            </TextBlock>
+                                            <TextBlock Text="COCKPIT OS | REMOTE CONTROL CENTER" FontSize="8.5" FontWeight="Bold" Foreground="{StaticResource TextDim}" Margin="1,1,0,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Center: Dynamic Island Connection & Ping Pill -->
+                                    <Border Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="14" Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" Padding="14,6">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Ellipse x:Name="ConnectionIndicator" Width="9" Height="9" Fill="{StaticResource AccentRed}" Margin="0,0,8,0">
+                                                <Ellipse.Effect>
+                                                    <DropShadowEffect x:Name="ConnectionGlow" BlurRadius="12" Color="#FF453A" ShadowDepth="0" Opacity="0.9"/>
+                                                </Ellipse.Effect>
+                                            </Ellipse>
+                                            <TextBlock x:Name="ConnectionLabel" Text="PHONE:" Foreground="{StaticResource TextDim}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock x:Name="DeviceNameText" Text="NOT CONNECTED" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            
+                                            <!-- Ping Radar Button Pill -->
+                                            <Button Click="PingTest_Click" ToolTip="Click to Test Network Latency" Style="{StaticResource NeonBtn}" Padding="8,3" Margin="10,0,0,0" Height="24" BorderBrush="{StaticResource AccentBlue}">
+                                                <TextBlock x:Name="PingStatusText" Text="&#x26A1; 15ms Ping" Foreground="{StaticResource AccentBlue}" FontSize="9.5" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Right: IP:Port Pill with 1-Click Copy -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border CornerRadius="12" Background="#1800D2FF" BorderBrush="#3300D2FF" BorderThickness="1" Padding="12,5" Margin="0,0,8,0">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="&#x1F310; " FontSize="12" VerticalAlignment="Center"/>
+                                                <TextBlock x:Name="LocalIpText" Text="127.0.0.1:8099" Foreground="{StaticResource AccentBlue}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Button Content="&#x1F4CB; COPY" Click="CopyIpPort_Click" Style="{StaticResource NeonBtn}" Padding="11,5" FontSize="10" FontWeight="Black" Height="30" BorderBrush="{StaticResource AccentBlue}"/>
+                                        <Button Content="&#x21BB; REFRESH" Click="RefreshNetwork_Click" ToolTip="Refresh available connection addresses" Style="{StaticResource NeonBtn}" Padding="9,5" Margin="6,0,0,0" FontSize="10" FontWeight="Black" Height="30"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 4 Apple Watch Activity Rings (Row 1) -->
+                            <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,18">
+                                <!-- CPU Activity Pod -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="4" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="68"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0" Width="64" Height="64">
+                                            <Ellipse Stroke="#13223B" StrokeThickness="5.5" Margin="3"/>
+                                            <Ellipse x:Name="CpuRingProgress" Stroke="{StaticResource AccentBlue}" StrokeThickness="5.5" StrokeEndLineCap="Round"
+                                                     StrokeDashArray="59.69" StrokeDashOffset="59.69" RenderTransformOrigin="0.5,0.5" Margin="3">
+                                                <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                                <Ellipse.Effect><DropShadowEffect BlurRadius="8" Color="#00D2FF" ShadowDepth="0" Opacity="0.6"/></Ellipse.Effect>
+                                            </Ellipse>
+                                            <TextBlock Text="CPU" Foreground="{StaticResource AccentBlue}" FontSize="11" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock Text="PROCESSOR" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold"/>
+                                            <TextBlock x:Name="CpuUsageText" Text="CPU 0%" Foreground="White" FontSize="14" FontWeight="Black"/>
+                                            <TextBlock x:Name="CpuTempText" Text="--&#x00B0;C" Foreground="{StaticResource AccentBlue}" FontSize="11" FontWeight="Bold" Margin="0,1,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- GPU Activity Pod -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="4" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="68"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0" Width="64" Height="64">
+                                            <Ellipse Stroke="#13223B" StrokeThickness="5.5" Margin="3"/>
+                                            <Ellipse x:Name="GpuRingProgress" Stroke="{StaticResource AccentPurple}" StrokeThickness="5.5" StrokeEndLineCap="Round"
+                                                     StrokeDashArray="59.69" StrokeDashOffset="59.69" RenderTransformOrigin="0.5,0.5" Margin="3">
+                                                <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                                <Ellipse.Effect><DropShadowEffect BlurRadius="8" Color="#BF5AF2" ShadowDepth="0" Opacity="0.6"/></Ellipse.Effect>
+                                            </Ellipse>
+                                            <TextBlock Text="GPU" Foreground="{StaticResource AccentPurple}" FontSize="11" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock Text="GRAPHICS" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold"/>
+                                            <TextBlock x:Name="GpuUsageText" Text="GPU 0%" Foreground="White" FontSize="14" FontWeight="Black"/>
+                                            <TextBlock x:Name="GpuTempText" Text="--&#x00B0;C" Foreground="{StaticResource AccentPurple}" FontSize="11" FontWeight="Bold" Margin="0,1,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- RAM Activity Pod -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="4" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="68"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0" Width="64" Height="64">
+                                            <Ellipse Stroke="#13223B" StrokeThickness="5.5" Margin="3"/>
+                                            <Ellipse x:Name="RamRingProgress" Stroke="{StaticResource AccentOrange}" StrokeThickness="5.5" StrokeEndLineCap="Round"
+                                                     StrokeDashArray="59.69" StrokeDashOffset="59.69" RenderTransformOrigin="0.5,0.5" Margin="3">
+                                                <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                                <Ellipse.Effect><DropShadowEffect BlurRadius="8" Color="#FF9F0A" ShadowDepth="0" Opacity="0.6"/></Ellipse.Effect>
+                                            </Ellipse>
+                                            <TextBlock Text="RAM" Foreground="{StaticResource AccentOrange}" FontSize="11" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock Text="MEMORY" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold"/>
+                                            <TextBlock x:Name="RamUsageText" Text="RAM 0%" Foreground="White" FontSize="14" FontWeight="Black"/>
+                                            <TextBlock x:Name="RamAvailText" Text="-- FREE" Foreground="{StaticResource AccentOrange}" FontSize="10.5" FontWeight="Bold" Margin="0,1,0,0" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- FAN Activity Pod -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="4" Padding="12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="68"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="0" Width="64" Height="64">
+                                            <Ellipse Stroke="#13223B" StrokeThickness="5.5" Margin="3"/>
+                                            <Ellipse x:Name="FanRingProgress" Stroke="{StaticResource AccentGreen}" StrokeThickness="5.5" StrokeEndLineCap="Round"
+                                                     StrokeDashArray="59.69" StrokeDashOffset="59.69" RenderTransformOrigin="0.5,0.5" Margin="3">
+                                                <Ellipse.RenderTransform><RotateTransform Angle="-90"/></Ellipse.RenderTransform>
+                                                <Ellipse.Effect><DropShadowEffect BlurRadius="8" Color="#00FF88" ShadowDepth="0" Opacity="0.6"/></Ellipse.Effect>
+                                            </Ellipse>
+                                            <TextBlock Text="FAN" Foreground="{StaticResource AccentGreen}" FontSize="11" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                            <TextBlock Text="COOLING" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold"/>
+                                            <TextBlock x:Name="FanSpeedText" Text="0" Foreground="White" FontSize="14" FontWeight="Black"/>
+                                            <TextBlock Text="RPM ACTIVE" Foreground="{StaticResource AccentGreen}" FontSize="10.5" FontWeight="Bold" Margin="0,1,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </UniformGrid>
+
+                            <!-- Row 2: Control Center (Sound & Display + Sleep Timer) -->
+                            <Grid Grid.Row="2" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Card A: Sound & Display Control Center -->
+                                <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,10">
+                                            <TextBlock Text="&#x1F50A; SOUND &amp; DISPLAY STUDIO" Foreground="{StaticResource AccentBlue}" FontSize="12" FontWeight="Bold"/>
+                                            <TextBlock x:Name="MasterVolumeText" Text="75%" Foreground="White" FontSize="13" FontWeight="Black" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <TextBlock Text="Master Audio Output" Foreground="{StaticResource TextDim}" FontSize="10" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                        <Slider x:Name="MasterVolumeSlider" Style="{StaticResource GlassSlider}" Minimum="0" Maximum="100" Value="75" ValueChanged="MasterVolumeSlider_ValueChanged" PreviewMouseUp="MasterVolumeSlider_PreviewMouseUp" Margin="0,0,0,10"/>
+                                        <UniformGrid Columns="4" Margin="0,0,0,10">
+                                            <Button Content="100%" Click="VolumePreset_Click" Tag="100" Style="{StaticResource NeonBtn}" Padding="4,5" FontSize="10" Margin="2"/>
+                                            <Button Content="75%" Click="VolumePreset_Click" Tag="75" Style="{StaticResource NeonBtn}" Padding="4,5" FontSize="10" Margin="2"/>
+                                            <Button Content="50%" Click="VolumePreset_Click" Tag="50" Style="{StaticResource NeonBtn}" Padding="4,5" FontSize="10" Margin="2"/>
+                                            <Button Content="25%" Click="VolumePreset_Click" Tag="25" Style="{StaticResource NeonBtn}" Padding="4,5" FontSize="10" Margin="2"/>
+                                        </UniformGrid>
+                                        <UniformGrid Columns="3">
+                                            <Button Content="&#x1F507; MUTE" Click="RemoteCmd_Click" Tag="mute" Style="{StaticResource NeonBtn}" Padding="4,7" FontSize="10" Margin="2"/>
+                                            <Button Content="&#x1F311; SCREEN OFF" Click="RemoteCmd_Click" Tag="monoff" Style="{StaticResource NeonBtn}" Padding="4,7" FontSize="10" Margin="2"/>
+                                            <Button Content="&#x1F504; AUDIO FIX" Click="Macro_Click" Tag="audiofix" Style="{StaticResource NeonBtn}" Padding="4,7" FontSize="10" Margin="2"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card B: Smart Sleep & Auto-Shutdown Timer with Stepper -->
+                                <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,0">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <TextBlock Text="&#x23F1; SMART SLEEP &amp; AUTO-SHUTDOWN" Foreground="{StaticResource AccentPurple}" FontSize="12" FontWeight="Bold"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                <Button Content="-10M" Click="TimerAdjust_Click" Tag="-10" Style="{StaticResource NeonBtn}" Padding="6,2" FontSize="9" Margin="0,0,4,0"/>
+                                                <Button Content="+10M" Click="TimerAdjust_Click" Tag="10" Style="{StaticResource NeonBtn}" Padding="6,2" FontSize="9"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Border CornerRadius="12" Background="#1400D2FF" BorderBrush="#3300D2FF" BorderThickness="1" Padding="12,6" Margin="0,0,0,10" HorizontalAlignment="Center">
+                                            <TextBlock x:Name="ShutdownCountdownText" Text="00:00:00 (IDLE)" Foreground="{StaticResource AccentBlue}" FontSize="16" FontWeight="Black" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <TextBlock Text="Quick Timer Presets:" Foreground="{StaticResource TextDim}" FontSize="10" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                        <UniformGrid Columns="5" Margin="0,0,0,8">
+                                            <Button Content="15M" Click="ShutdownTimer_Click" Tag="15" Style="{StaticResource NeonBtn}" Padding="2,6" FontSize="10" Margin="2"/>
+                                            <Button Content="30M" Click="ShutdownTimer_Click" Tag="30" Style="{StaticResource NeonBtn}" Padding="2,6" FontSize="10" Margin="2"/>
+                                            <Button Content="45M" Click="ShutdownTimer_Click" Tag="45" Style="{StaticResource NeonBtn}" Padding="2,6" FontSize="10" Margin="2"/>
+                                            <Button Content="60M" Click="ShutdownTimer_Click" Tag="60" Style="{StaticResource NeonBtn}" Padding="2,6" FontSize="10" Margin="2"/>
+                                            <Button Content="120M" Click="ShutdownTimer_Click" Tag="120" Style="{StaticResource NeonBtn}" Padding="2,6" FontSize="10" Margin="2"/>
+                                        </UniformGrid>
+                                        <Button Content="&#x274C; CANCEL SHUTDOWN TIMER" Click="CancelShutdownTimer_Click" Style="{StaticResource NeonBtn}" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}" Padding="8,6" FontSize="10" FontWeight="Bold"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Row 3: 1-Tap System Optimizer Suite -->
+                            <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,10">
+                                        <TextBlock Text="&#x26A1; 1-TAP SYSTEM OPTIMIZER &amp; MAINTENANCE" Foreground="{StaticResource AccentGreen}" FontSize="12" FontWeight="Bold"/>
+                                        <TextBlock Text="Instant PC Performance Boost" Foreground="{StaticResource TextDim}" FontSize="10" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <UniformGrid Columns="4" Rows="2">
+                                        <Button Content="&#x1F5D1; EMPTY TRASH" Click="EmptyRecycleBin_Click" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F9F9; CLEAN TEMP" Click="Macro_Click" Tag="cleartemp" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F310; FLUSH DNS" Click="Macro_Click" Tag="flushdns" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F680; BOOST RAM" Click="Macro_Click" Tag="boostram" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F504; RESTART EXPLORER" Click="Macro_Click" Tag="restartexp" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x2615; CAFFEINE MODE" Click="CaffeineToggle_Click" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F319; DARK THEME" Click="Macro_Click" Tag="toggledark" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                        <Button Content="&#x1F50A; RESET AUDIO" Click="Macro_Click" Tag="audiofix" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,8"/>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Row 4: Cockpit App Launcher & Web Shortcuts -->
+                            <Border Grid.Row="4" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,10">
+                                        <TextBlock Text="&#x1F680; QUICK LAUNCHER &amp; APP DOCK" Foreground="{StaticResource AccentOrange}" FontSize="12" FontWeight="Bold"/>
+                                        <TextBlock Text="1-Tap Instant Tools &amp; Web Apps" Foreground="{StaticResource TextDim}" FontSize="10" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <UniformGrid Columns="6" Rows="2" Margin="0,0,0,10">
+                                        <Button Content="&#x1F4CA; TaskMgr" Click="RemoteCmd_Click" Tag="taskmgr" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F4BB; CMD" Click="RemoteCmd_Click" Tag="cmd" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x26A1; PowerShell" Click="RemoteCmd_Click" Tag="powershell" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F9EE; Calculator" Click="RemoteCmd_Click" Tag="calc" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F4DD; Notepad" Click="RemoteCmd_Click" Tag="notepad" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x2702; Snipping" Click="RemoteCmd_Click" Tag="snipping" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F310; Browser" Click="RemoteCmd_Click" Tag="chrome" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F4C1; Explorer" Click="RemoteCmd_Click" Tag="explorer" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F4F8; Screenshot" Click="RemoteCmd_Click" Tag="screenshot" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x2699; Settings" Click="RemoteCmd_Click" Tag="settings" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F512; Lock PC" Click="RemoteCmd_Click" Tag="lock" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                        <Button Content="&#x1F4A4; Sleep PC" Click="RemoteCmd_Click" Tag="sleep" Style="{StaticResource NeonBtn}" Margin="3" Padding="3,8"/>
+                                    </UniformGrid>
+
+                                    <!-- 1-Tap Web Shortcuts Row -->
+                                    <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="12" Padding="8,6">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="&#x1F310; QUICK WEB:" Foreground="{StaticResource AccentBlue}" FontSize="10" FontWeight="Black" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                            <UniformGrid Grid.Column="1" Columns="6">
+                                                <Button Content="&#x25B6; YouTube" Click="LaunchWeb_Click" Tag="youtube" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                                <Button Content="&#x1F4AC; WhatsApp" Click="LaunchWeb_Click" Tag="whatsapp" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                                <Button Content="&#x1F916; ChatGPT" Click="LaunchWeb_Click" Tag="chatgpt" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                                <Button Content="&#x1F419; GitHub" Click="LaunchWeb_Click" Tag="github" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                                <Button Content="&#x1F50D; Google" Click="LaunchWeb_Click" Tag="google" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                                <Button Content="&#x26A1; Speedtest" Click="LaunchWeb_Click" Tag="speedtest" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,4" FontSize="10"/>
+                                            </UniformGrid>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Row 5: Middle Cards Grid (System Info, Storage, Top Processes, Liquid Memo) -->
+                            <Grid Grid.Row="5" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Card 1: System Information & Networks -->
+                                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,8">
+                                    <StackPanel>
+                                        <TextBlock Text="SYSTEM INFORMATION &amp; NETWORKS" Foreground="{StaticResource AccentPurple}" FontSize="12" Margin="0,0,0,10" FontWeight="Bold"/>
+                                        <Grid Margin="0,2">
+                                            <TextBlock Text="PC HOSTNAME" Foreground="{StaticResource TextDim}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtHostname" Text="PC-NAME" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Grid Margin="0,3,0,2">
+                                            <TextBlock Text="OPERATING SYSTEM" Foreground="{StaticResource TextDim}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtOsName" Text="Windows OS" Foreground="White" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" MaxWidth="180" TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                        <Grid Margin="0,3,0,2">
+                                            <TextBlock Text="SYSTEM UPTIME" Foreground="{StaticResource TextDim}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtUptime" Text="--" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Grid Margin="0,3,0,2">
+                                            <TextBlock Text="CURRENT TIME" Foreground="{StaticResource TextDim}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtCurrentTime" Text="--" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Grid Margin="0,3,0,2">
+                                            <TextBlock Text="POWER SOURCE" Foreground="{StaticResource TextDim}" FontSize="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtBattery" Text="--" Foreground="White" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                        </Grid>
+                                        <Separator Background="#162744" Margin="0,6,0,6"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                                <TextBlock x:Name="TxtNetDown" Text="&#x1F4E5; 0.00 MB/s" Foreground="{StaticResource AccentGreen}" FontSize="12" FontWeight="Bold"/>
+                                                <TextBlock Text="Download" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                                <TextBlock x:Name="TxtNetUp" Text="&#x1F4E4; 0.00 MB/s" Foreground="{StaticResource AccentPurple}" FontSize="12" FontWeight="Bold"/>
+                                                <TextBlock Text="Upload" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 2: Storage Space Usage -->
+                                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="STORAGE SPACE USAGE" Foreground="{StaticResource AccentOrange}" FontSize="12" Margin="0,0,0,10" FontWeight="Bold"/>
+                                        <ItemsControl x:Name="DrivesList">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Margin="0,4">
+                                                        <Grid>
+                                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Label}" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                                                                <Button Content="&#x1F4C1; OPEN" Click="OpenDrive_Click" Tag="{Binding Label}" Style="{StaticResource NeonBtn}" Padding="6,1" FontSize="8.5" Margin="8,0,0,0" Height="18"/>
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding UsagePercent, StringFormat='{}{0:F0}%'}" Foreground="{StaticResource AccentBlue}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                        <ProgressBar Value="{Binding UsagePercent, Mode=OneWay}" Height="5" Background="#0E1A30" Foreground="{StaticResource AccentBlue}" BorderThickness="0" Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 3: Top Memory Consumers & Task Killer -->
+                                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,8,8,0">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <TextBlock Text="TOP PROCESSES &amp; TASK KILLER" Foreground="{StaticResource AccentRed}" FontSize="12" FontWeight="Bold"/>
+                                            <Button Content="&#x1F504; REFRESH" Click="RefreshProcesses_Click" Style="{StaticResource NeonBtn}" HorizontalAlignment="Right" Padding="6,2" FontSize="9"/>
+                                        </Grid>
+                                        <ItemsControl x:Name="TopProcessesList">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Margin="0,3">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Name}" Foreground="White" FontSize="11" FontWeight="Bold" TextTrimming="CharacterEllipsis" MaxWidth="120" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Info}" Foreground="{StaticResource AccentPurple}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" Margin="6,0"/>
+                                                        <Button Grid.Column="2" Content="KILL" Click="KillProcess_Click" Tag="{Binding Pid}" Style="{StaticResource NeonBtn}" Padding="6,1" FontSize="9" FontWeight="Black" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}" Height="20"/>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 4: Cockpit Memo & Live Clipboard Sync -->
+                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="8,8,0,0">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,4">
+                                            <TextBlock Text="&#x1F4CB; LIVE CLIPBOARD &amp; MEMO" Foreground="{StaticResource AccentBlue}" FontSize="12" FontWeight="Bold"/>
+                                            <Button Content="CLEAR" Click="ClearClipboard_Click" Style="{StaticResource NeonBtn}" HorizontalAlignment="Right" Padding="6,2" FontSize="9"/>
+                                        </Grid>
+                                        <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="8" Padding="6" MinHeight="36" Margin="0,0,0,8">
+                                            <TextBlock x:Name="CurrentClipboardText" Text="(Listening to clipboard...)" Foreground="{StaticResource TextDim}" FontSize="10.5" TextWrapping="Wrap" MaxHeight="34"/>
+                                        </Border>
+
+                                        <TextBlock Text="Quick Note &amp; Phone Beam:" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold" Margin="0,0,0,3"/>
+                                        <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="8" Padding="2">
+                                            <TextBox x:Name="QuickNoteBox" Height="38" Background="Transparent" Foreground="White" BorderThickness="0" Padding="4,2" FontSize="10.5" TextWrapping="Wrap" AcceptsReturn="True"/>
+                                        </Border>
+                                            <Grid Margin="0,6,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" Content="&#x1F4CB; COPY NOTE" Click="NoteCopy_Click" Style="{StaticResource NeonBtn}" Padding="6,3" FontSize="9" Margin="0,0,4,0"/>
+                                            <Button Grid.Column="1" Content="&#x1F9F9; CLEAR" Click="NoteClear_Click" Style="{StaticResource NeonBtn}" Padding="6,3" FontSize="9" Margin="0,0,4,0"/>
+                                            <Button Grid.Column="2" Content="&#x1F4F1; PUSH TO PHONE" Click="NoteSend_Click" Style="{StaticResource NeonBtn}" Padding="8,3" FontSize="9" FontWeight="Black" BorderBrush="{StaticResource AccentGreen}" Foreground="{StaticResource AccentGreen}" HorizontalAlignment="Right"/>
+                                            <Button Grid.Column="3" Content="&#x1F50A; FIND PHONE" Click="FindPhone_Click" Style="{StaticResource NeonBtn}" Padding="7,3" FontSize="9" Margin="4,0,0,0" BorderBrush="{StaticResource AccentPurple}" Foreground="{StaticResource AccentPurple}"/>
+                                            </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Bottom Row (Row 6): Activate Gaming Mode Button -->
+                            <StackPanel Grid.Row="6" Margin="0,5,0,10">
+                                <ToggleButton x:Name="GamingModeToggle" Click="GamingModeToggle_Click" Height="56" Cursor="Hand">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border x:Name="border" CornerRadius="16" BorderThickness="1.5" Background="#0E1A30" BorderBrush="#33BF5AF2">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="20" Color="#BF5AF2" ShadowDepth="0" Opacity="0.3"/>
+                                                </Border.Effect>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock Text="&#x1F3AE;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                                    <StackPanel VerticalAlignment="Center">
+                                                        <TextBlock x:Name="txt" Text="ACTIVATE MASTER GAMING MODE" Foreground="White" FontSize="14" FontWeight="Black"/>
+                                                        <TextBlock x:Name="subtxt" Text="Unlock peak performance &amp; silence notifications" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#1500D2FF"/>
+                                                    <Setter TargetName="border" Property="BorderBrush" Value="#00D2FF"/>
+                                                    <Setter TargetName="border" Property="Effect">
+                                                        <Setter.Value>
+                                                            <DropShadowEffect BlurRadius="30" Color="#00D2FF" ShadowDepth="0" Opacity="0.6"/>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Setter TargetName="txt" Property="Text" Value="GAMING MODE ACTIVE"/>
+                                                    <Setter TargetName="txt" Property="Foreground" Value="{StaticResource AccentBlue}"/>
+                                                    <Setter TargetName="subtxt" Property="Text" Value="CPU/GPU priority boosted | Background tasks suspended"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                                <StackPanel x:Name="GamingOptionsPanel" Visibility="Collapsed" Margin="10,8,10,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="GamingStatusText" Text="Active - Optimizing..." Foreground="{StaticResource AccentGreen}" FontSize="11" FontWeight="Bold" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                    <CheckBox x:Name="CbHighPerformance" Content="High Performance Power Profile" Foreground="{StaticResource AccentGreen}" IsChecked="True" Margin="0,0,15,0" FontSize="11"/>
+                                    <CheckBox x:Name="CbDND" Content="Silence Windows Toasts (DND)" Foreground="{StaticResource AccentGreen}" IsChecked="True" FontSize="11"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 2. LIQUID MIRROR PANEL (Phone Screen on PC) -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="MirrorPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Mirror Action Header -->
+                            <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,18" Padding="14,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="&#x25C0; DASHBOARD" Click="StopMirror_Click" Style="{StaticResource NeonBtn}" Padding="10,5" Margin="0,0,12,0" FontSize="10.5" FontWeight="Bold"/>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="&#x1F4F1; PHONE SCREEN MIRROR" Foreground="White" FontSize="15" FontWeight="Black"/>
+                                            <TextBlock Text="Ultra Low-Latency Touch &amp; Display Hub" Foreground="{StaticResource TextDim}" FontSize="9"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Status Pill -->
+                                    <Border Grid.Column="1" HorizontalAlignment="Center" CornerRadius="12" Background="#1500D2FF" BorderBrush="#3300D2FF" BorderThickness="1" Padding="12,5">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="STATUS: " Foreground="{StaticResource TextDim}" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock x:Name="MirrorHubStatusText" Text="Ready" Foreground="{StaticResource AccentBlue}" FontSize="10" FontWeight="Black"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Controls -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button x:Name="MirrorStartBtn" Content="&#x25B6; START STREAM" Click="MirrorStartBtn_Click" Style="{StaticResource NeonBtn}" Padding="12,5" Margin="0,0,6,0" BorderBrush="{StaticResource AccentGreen}" Foreground="{StaticResource AccentGreen}" FontSize="10" FontWeight="Bold"/>
+                                        <Button x:Name="MirrorStopBtn" Content="&#x25A0; STOP STREAM" Click="MirrorStopBtn_Click" Style="{StaticResource NeonBtn}" Padding="12,5" Margin="0,0,6,0" Visibility="Collapsed" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}" FontSize="10" FontWeight="Bold"/>
+                                        <Button Content="&#x1F504; ROTATE" Click="RotateMirror_Click" Style="{StaticResource NeonBtn}" Padding="10,5" Margin="0,0,6,0" FontSize="10" FontWeight="Bold"/>
+                                        <Button Content="&#x1F4F8; SNAPSHOT" Click="SnapshotMirror_Click" Style="{StaticResource NeonBtn}" Padding="10,5" FontSize="10" FontWeight="Bold" BorderBrush="{StaticResource AccentPurple}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Physical Phone Cockpit Frame Container -->
+                            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,0,0,20">
+                                <Border x:Name="MirrorFrameBorder" Width="320" Height="560" CornerRadius="32"
+                                        Background="#050A14" BorderBrush="#1A2D4A" BorderThickness="2.5"
+                                        ClipToBounds="True" AllowDrop="True" Drop="FilesPanel_Drop" DragOver="FilesPanel_DragOver">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="35" Color="#00D2FF" ShadowDepth="4" Opacity="0.25"/>
+                                    </Border.Effect>
+                                    <Grid>
+                                        <!-- Mirrored Screen Surface -->
+                                        <Image x:Name="MobileScreenImage" Stretch="Uniform" MouseLeftButtonDown="MobileScreen_MouseDown"/>
+
+                                        <!-- Top Dynamic Island Pill Cutout -->
+                                        <Border Width="96" Height="24" CornerRadius="12" Background="#EA050A14" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0" IsHitTestVisible="False">
+                                            <Grid>
+                                                <!-- Camera & FaceID Sensors -->
+                                                <Ellipse Width="10" Height="10" Fill="#1AFFFFFF" HorizontalAlignment="Left" Margin="14,0,0,0"/>
+                                                <Ellipse Width="7" Height="7" Fill="#3000D2FF" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Waiting Overlay Status Text -->
+                                        <StackPanel x:Name="MirrorPlaceholder" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="&#x1F4F1;" FontSize="44" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                            <TextBlock x:Name="MirrorStatusText" Text="Waiting for Mobile Stream..." Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Open PC Master App on phone and tap Mirror" Foreground="{StaticResource TextDim}" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <!-- Bottom Phone Home Indicator Bar -->
+                                        <Border Width="110" Height="4" CornerRadius="2" Background="#4A5F80" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,8" IsHitTestVisible="False"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 3. AIRDROP & FILES PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="FilesPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0" Margin="0,0,0,18">
+                                <StackPanel>
+                                    <TextBlock Text="AIRDROP &amp; WIRELESS FILE HUB" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                    <TextBlock Text="High-speed direct Wi-Fi beaming and phone storage sync" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Wireless File Hub Controls -->
+                            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,14" Padding="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="&#x1F310; WIRELESS HUB:" Foreground="{StaticResource AccentBlue}" FontSize="11.5" FontWeight="Bold" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                        <Button x:Name="StartFileServerButton" Content="HUB ACTIVE (8099)" Click="StartFileServerButton_Click" Padding="12,5" FontSize="10.5" FontWeight="Bold" BorderBrush="{StaticResource AccentGreen}" Foreground="{StaticResource AccentGreen}">
+                                            <Button.Resources>
+                                                <Style TargetType="Button" BasedOn="{StaticResource NeonBtn}">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="Tag" Value="Started">
+                                                            <Setter Property="Background" Value="#2500FF88"/>
+                                                            <Setter Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                                            <Setter Property="Content" Value="HUB ACTIVE (8099)"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Resources>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="&#x2795; UPLOAD FILE" Click="BrowseAndUploadFile_Click" Style="{StaticResource NeonBtn}" Padding="12,5" Margin="0,0,8,0" FontSize="10.5" FontWeight="Bold" BorderBrush="{StaticResource AccentBlue}"/>
+                                        <Button Content="&#x1F4C1; OPEN FOLDER" Click="OpenSharedFolder_Click" Style="{StaticResource NeonBtn}" Padding="10,5" Margin="0,0,8,0" FontSize="10.5"/>
+                                        <Button Content="&#x1F6E1; FIX FIREWALL" Click="FixFirewall_Click" Style="{StaticResource NeonBtn}" Padding="10,5" FontSize="10.5"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- AirDrop Drag & Drop Zone -->
+                            <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16" Padding="20" AllowDrop="True" Drop="FilesPanel_Drop" DragOver="FilesPanel_DragOver" BorderBrush="#3300D2FF" Background="#0B1528">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock Text="&#x1F4E1;" FontSize="36" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                    <TextBlock Text="AirDrop Direct to Phone: Drag &amp; Drop Files Here" Foreground="White" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Files dropped here are automatically accessible on your connected device" Foreground="{StaticResource TextDim}" FontSize="10" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Shared & Received Files Catalog -->
+                            <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" MinHeight="260">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Filter / Search Header -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="220"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="SHARED FILES CATALOG" Foreground="{StaticResource AccentPurple}" FontWeight="Bold" FontSize="12.5" VerticalAlignment="Center"/>
+                                        
+                                        <!-- Search Input -->
+                                        <Border Grid.Column="2" CornerRadius="10" Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" Padding="8,4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="&#x1F50D; " FontSize="10" Foreground="{StaticResource TextDim}" VerticalAlignment="Center"/>
+                                                <TextBox Grid.Column="1" x:Name="FilesSearchBox" TextChanged="FilesSearchBox_TextChanged" Background="Transparent" Foreground="White" BorderThickness="0" FontSize="11" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Files List -->
+                                    <ListBox x:Name="SharedFilesList" Grid.Row="1" Background="Transparent" BorderThickness="0" Foreground="White"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch"
+                                             PreviewMouseLeftButtonDown="SharedFilesList_PreviewMouseLeftButtonDown"
+                                             MouseMove="SharedFilesList_MouseMove">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="#162744" BorderThickness="0,0,0,1" Padding="8,6" Margin="0,2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="32"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Icon}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                            <TextBlock Text="{Binding Size}" Foreground="{StaticResource TextDim}" FontSize="9.5" Margin="0,1,0,0"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                            <Button Content="OPEN" Click="OpenFile_Click" Tag="{Binding Path}" Style="{StaticResource NeonBtn}" Margin="0,0,6,0" Padding="10,4" FontSize="9.5" FontWeight="Bold"/>
+                                                            <Button Content="DELETE" Click="DeleteFile_Click" Tag="{Binding Path}" Style="{StaticResource NeonBtn}" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}" Padding="8,4" FontSize="9.5"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock x:Name="EmptyFilesText" Grid.Row="1" Text="No files shared yet. Drag &amp; drop files above or click UPLOAD FILE." Foreground="{StaticResource TextDeepDim}" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" FontSize="13"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 4. APP LIBRARY & REMOTE LAUNCHER PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="RemotePanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock Text="COCKPIT APP LIBRARY &amp; LAUNCHER" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="Categorized springboard launcher for Windows administration, productivity &amp; power" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+
+                            <UniformGrid Grid.Row="1" Columns="2">
+                                <!-- Pod 1: System Management -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x1F6E0; SYSTEM &amp; ADMINISTRATION" Foreground="{StaticResource AccentBlue}" FontWeight="Bold" FontSize="12" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F4CA; Task Manager" Click="RemoteCmd_Click" Tag="taskmgr" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4BB; Command Prompt" Click="RemoteCmd_Click" Tag="cmd" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x26A1; PowerShell" Click="RemoteCmd_Click" Tag="powershell" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F511; Regedit" Click="RemoteCmd_Click" Tag="regedit" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F50C; Device Manager" Click="RemoteCmd_Click" Tag="devmgmt" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F39B; Control Panel" Click="RemoteCmd_Click" Tag="control" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Pod 2: Productivity & Utilities -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x270E; PRODUCTIVITY &amp; TOOLS" Foreground="{StaticResource AccentPurple}" FontWeight="Bold" FontSize="12" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F9EE; Calculator" Click="RemoteCmd_Click" Tag="calc" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4DD; Notepad" Click="RemoteCmd_Click" Tag="notepad" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x2702; Snipping Tool" Click="RemoteCmd_Click" Tag="snipping" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4F8; Screenshot" Click="RemoteCmd_Click" Tag="screenshot" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x2328; On-Screen Keys" Click="RemoteCmd_Click" Tag="osk" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F3A8; MS Paint" Click="RemoteCmd_Click" Tag="paint" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Pod 3: Navigation & Folders -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x1F4C2; FOLDERS &amp; BROWSING" Foreground="{StaticResource AccentGreen}" FontWeight="Bold" FontSize="12" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F4C1; File Explorer" Click="RemoteCmd_Click" Tag="explorer" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4E5; Downloads" Click="RemoteCmd_Click" Tag="downloads" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4C4; Documents" Click="RemoteCmd_Click" Tag="documents" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F310; Web Browser" Click="RemoteCmd_Click" Tag="chrome" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Pod 4: Power & Security -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x1F512; POWER &amp; SECURITY" Foreground="{StaticResource AccentRed}" FontWeight="Bold" FontSize="12" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F512; Lock PC" Click="RemoteCmd_Click" Tag="lock" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F4A4; Sleep Mode" Click="RemoteCmd_Click" Tag="sleep" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x1F311; Screen Off" Click="RemoteCmd_Click" Tag="monoff" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10"/>
+                                            <Button Content="&#x274C; Abort Shutdown" Click="RemoteCmd_Click" Tag="abort" Style="{StaticResource NeonBtn}" Margin="3" Padding="6,10" BorderBrush="{StaticResource AccentRed}"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 5. PRO OPTIMIZER & MAINTENANCE PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="MacrosPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock Text="&#x26A1; COCKPIT PERFORMANCE &amp; OPTIMIZER" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="1-Tap deep clean, memory defragmentation, network stack tuning &amp; audio repair" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}">
+                                <UniformGrid Columns="3">
+                                    <Button Click="Macro_Click" Tag="boostram" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F680;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="BOOST RAM" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Purge working set &amp; cache" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="Macro_Click" Tag="cleartemp" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F9F9;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="CLEAN TEMP FILES" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Remove %temp% &amp; junk" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="EmptyRecycleBin_Click" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F5D1;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="EMPTY TRASH" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Instant recycle bin purge" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="Macro_Click" Tag="flushdns" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F310;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="FLUSH DNS" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Reset resolver cache" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="Macro_Click" Tag="restartexp" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F504;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="RESTART EXPLORER" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Revive frozen taskbar" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="CaffeineToggle_Click" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x2615;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="CAFFEINE MODE" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Prevent system sleep" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="Macro_Click" Tag="toggledark" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F319;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="TOGGLE THEME" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Switch Dark / Light Mode" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="Macro_Click" Tag="audiofix" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x1F50A;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="AUDIO SUBSYSTEM FIX" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Restart audiosrv daemon" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Click="KillNotResponding_Click" Style="{StaticResource NeonBtn}" Margin="6" Padding="10,16" BorderBrush="{StaticResource AccentRed}">
+                                        <StackPanel HorizontalAlignment="Center">
+                                            <TextBlock Text="&#x26A1;" FontSize="24" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                                            <TextBlock Text="KILL FROZEN APPS" FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentRed}" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="End unresponsive tasks" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </UniformGrid>
+                            </Border>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 6. MEDIA STUDIO & APPLE PLAYER PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="MediaPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock Text="&#x1F3B5; COCKPIT MEDIA STUDIO &amp; PLAYER" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="Tactile media playback controls, dynamic audio fader &amp; entertainment hubs" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Padding="24">
+                                <StackPanel>
+                                    <!-- Now Playing Card Mockup -->
+                                    <Grid Margin="0,0,0,24">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="90" Height="90" CornerRadius="20" Background="#20BF5AF2" BorderBrush="#40BF5AF2" BorderThickness="1.5">
+                                            <Border.Effect>
+                                                <DropShadowEffect BlurRadius="20" Color="#BF5AF2" ShadowDepth="0" Opacity="0.4"/>
+                                            </Border.Effect>
+                                            <TextBlock Text="&#x1F3A7;" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
+                                            <Border HorizontalAlignment="Left" Background="#1800D2FF" CornerRadius="6" Padding="6,2" Margin="0,0,0,6">
+                                                <TextBlock Text="WINDOWS AUDIO STREAM" Foreground="{StaticResource AccentBlue}" FontSize="9" FontWeight="Black"/>
+                                            </Border>
+                                            <TextBlock Text="Universal PC Media Controller" Foreground="White" FontSize="18" FontWeight="Black"/>
+                                            <TextBlock Text="Spotify | YouTube | Browser | VLC Player" Foreground="{StaticResource TextDim}" FontSize="11" Margin="0,3,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Transport Controls -->
+                                    <UniformGrid Columns="3" Margin="0,0,0,20">
+                                        <Button Content="&#x23EE; PREV TRACK" Click="RemoteCmd_Click" Tag="prev" Style="{StaticResource NeonBtn}" Margin="6" Height="54" FontSize="13" FontWeight="Bold"/>
+                                        <Button Content="&#x23EF; PLAY / PAUSE" Click="RemoteCmd_Click" Tag="playpause" Style="{StaticResource NeonBtn}" Margin="6" Height="54" FontSize="14" FontWeight="Black" BorderBrush="{StaticResource AccentBlue}"/>
+                                        <Button Content="&#x23ED; NEXT TRACK" Click="RemoteCmd_Click" Tag="next" Style="{StaticResource NeonBtn}" Margin="6" Height="54" FontSize="13" FontWeight="Bold"/>
+                                    </UniformGrid>
+
+                                    <!-- Volume Slider & Presets -->
+                                    <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="16" Padding="16" Margin="0,0,0,20">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,8">
+                                                <TextBlock Text="&#x1F50A; MASTER OUTPUT LEVEL" Foreground="{StaticResource AccentBlue}" FontSize="11" FontWeight="Bold"/>
+                                                <TextBlock Text="Global Audio Fader" Foreground="{StaticResource TextDim}" FontSize="9" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                            <UniformGrid Columns="5" Margin="0,0,0,8">
+                                                <Button Content="100%" Click="VolumePreset_Click" Tag="100" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                                <Button Content="75%" Click="VolumePreset_Click" Tag="75" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                                <Button Content="50%" Click="VolumePreset_Click" Tag="50" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                                <Button Content="25%" Click="VolumePreset_Click" Tag="25" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                                <Button Content="&#x1F507; MUTE" Click="RemoteCmd_Click" Tag="mute" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}"/>
+                                            </UniformGrid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Quick Media Launchers -->
+                                    <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="QUICK LAUNCH:" Foreground="{StaticResource AccentPurple}" FontSize="10.5" FontWeight="Black" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                            <UniformGrid Grid.Column="1" Columns="4">
+                                                <Button Content="&#x1F7E2; Spotify" Click="RemoteCmd_Click" Tag="spotify" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,6" FontSize="10.5"/>
+                                                <Button Content="&#x1F534; YouTube" Click="LaunchWeb_Click" Tag="youtube" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,6" FontSize="10.5"/>
+                                                <Button Content="&#x1F7E0; Chrome Music" Click="RemoteCmd_Click" Tag="chrome" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,6" FontSize="10.5"/>
+                                                <Button Content="&#x1F39E; Media Player" Click="RemoteCmd_Click" Tag="cmd" Style="{StaticResource NeonBtn}" Margin="2" Padding="4,6" FontSize="10.5"/>
+                                            </UniformGrid>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 7. MOBILE NOTIFICATIONS PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="NotificationsPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                                                    <!-- Header -->
+                            <Grid Grid.Row="0" Margin="0,0,0,18">
+                                <StackPanel>
+                                    <TextBlock Text="MOBILE NOTIFICATION CENTER" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                    <TextBlock Text="Real-time push alerts, messaging sync &amp; instant replies from phone" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                                </StackPanel>
+                                <Button Content="&#x1F9F9; CLEAR ALL" Click="ClearAllNotifications_Click" Style="{StaticResource NeonBtn}" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="12,5" FontSize="10.5" FontWeight="Bold"/>
+                            </Grid>
+
+                            <!-- Notification Cards Container -->
+                            <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" MinHeight="340">
+                                <Grid>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="520">
+                                        <ItemsControl x:Name="NotificationList">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="16" Margin="0,0,0,10" Padding="14">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                                    <Border Background="#1500D2FF" CornerRadius="6" Padding="6,2" Margin="0,0,8,0">
+                                                                        <TextBlock Text="{Binding AppName}" Foreground="{StaticResource AccentBlue}" FontSize="10" FontWeight="Black"/>
+                                                                    </Border>
+                                                                    <TextBlock Text="{Binding Title}" Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                                <TextBlock Text="{Binding Content}" Foreground="{StaticResource TextDim}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,8"/>
+                                                                
+                                                                <!-- Inline Quick Reply -->
+                                                                <Grid x:Name="ReplyPanel" Visibility="{Binding CanReply, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBox x:Name="ReplyBox" Background="#0B1528" Foreground="White" BorderBrush="#1A2D4A" BorderThickness="1" Padding="8,5" Tag="{Binding Id}" KeyDown="ReplyBox_KeyDown" FontSize="11.5"/>
+                                                                    <Button Grid.Column="1" Content="SEND" Click="NotificationReply_Click" Style="{StaticResource NeonBtn}" Padding="12,5" Margin="6,0,0,0" FontSize="10.5" FontWeight="Bold" BorderBrush="{StaticResource AccentBlue}"/>
+                                                                </Grid>
+                                                            </StackPanel>
+                                                            <Button Grid.Column="1" Content="&#x2715;" Background="Transparent" Foreground="{StaticResource AccentRed}" BorderThickness="0" VerticalAlignment="Top" Click="DismissNotification_Click" Tag="{Binding Id}" Cursor="Hand" FontSize="13"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+
+                                    <!-- Empty Placeholder -->
+                                    <StackPanel x:Name="NoNotifText" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Visible">
+                                        <TextBlock Text="&#x1F514;" FontSize="40" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                        <TextBlock Text="No active notifications" Foreground="White" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Notifications from your phone will appear here in real-time" Foreground="{StaticResource TextDim}" FontSize="11" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 8. SYSTEM HARDWARE & POWER PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="SystemPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock Text="&#x2699; HARDWARE &amp; POWER STUDIO" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="Active power scheme, display brightness calibration &amp; power controls" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+
+                            <UniformGrid Grid.Row="1" Columns="2" VerticalAlignment="Top">
+                                <!-- Power Plan Card -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x26A1; POWER PLAN MANAGEMENT" Foreground="{StaticResource AccentBlue}" FontWeight="Bold" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F50B; SAVER" Click="PowerPlan_Click" Tag="saver" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="&#x2696; BALANCED" Click="PowerPlan_Click" Tag="balanced" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="&#x26A1; HIGH PERF" Click="PowerPlan_Click" Tag="high" Style="{StaticResource NeonBtn}" Margin="3" Grid.ColumnSpan="2"/>
+                                            <Button Content="&#x1F680; ULTIMATE" Click="PowerPlan_Click" Tag="ultimate" Style="{StaticResource NeonBtn}" Margin="3" Grid.ColumnSpan="2" BorderBrush="{StaticResource AccentPurple}"/>
+                                        </UniformGrid>
+                                        <TextBlock x:Name="CurrentPowerPlanText" Text="Current: Detecting..." Foreground="{StaticResource TextDim}" FontSize="11" Margin="0,12,0,0" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Brightness Studio Card -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x2600; DISPLAY BRIGHTNESS" Foreground="{StaticResource AccentOrange}" FontWeight="Bold" Margin="0,0,0,10"/>
+                                        <TextBlock x:Name="BrightnessValueText" Text="100%" Foreground="White" FontSize="36" FontWeight="Black" HorizontalAlignment="Center" Margin="0,4"/>
+                                        <Slider x:Name="BrightnessSlider" Style="{StaticResource GlassSlider}" Minimum="0" Maximum="100" Value="100" ValueChanged="BrightnessSlider_Changed" Margin="0,8,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F506; INCREASE" Click="BrightnessUp_Click" Style="{StaticResource NeonBtn}" Margin="2"/>
+                                            <Button Content="&#x1F505; DECREASE" Click="BrightnessDown_Click" Style="{StaticResource NeonBtn}" Margin="2"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Sleep & Shutdown Suite -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x23F1; SHUTDOWN TIMERS" Foreground="{StaticResource AccentRed}" FontWeight="Bold" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="3">
+                                            <Button Content="15M" Click="ShutdownTimer_Click" Tag="15" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="30M" Click="ShutdownTimer_Click" Tag="30" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="1H" Click="ShutdownTimer_Click" Tag="60" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="2H" Click="ShutdownTimer_Click" Tag="120" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="4H" Click="ShutdownTimer_Click" Tag="240" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="ABORT" Click="ShutdownTimer_Click" Tag="0" Style="{StaticResource NeonBtn}" Margin="3" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Display & Power Actions -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="&#x1F512; DISPLAY &amp; SESSION" Foreground="{StaticResource AccentPurple}" FontWeight="Bold" Margin="0,0,0,12"/>
+                                        <UniformGrid Columns="2">
+                                            <Button Content="&#x1F311; SCREEN OFF" Click="RemoteCmd_Click" Tag="monoff" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="&#x1F512; LOCK PC" Click="RemoteCmd_Click" Tag="lock" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="&#x1F4A4; SLEEP" Click="RemoteCmd_Click" Tag="sleep" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                            <Button Content="&#x1F4F8; SCREENSHOT" Click="RemoteCmd_Click" Tag="screenshot" Style="{StaticResource NeonBtn}" Margin="3"/>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </Grid>
+
+                        <!-- ============================================== -->
+                        <!-- 9. PREFERENCES & LOGS PANEL -->
+                        <!-- ============================================== -->
+                        <Grid x:Name="SettingsPanel" Visibility="Collapsed" Style="{StaticResource PanelStyle}">
+                            <Grid.RenderTransform><TranslateTransform/></Grid.RenderTransform>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock Text="&#x1F6E0; PREFERENCES &amp; SYSTEM CONFIG" FontSize="22" FontWeight="Black" Foreground="White"/>
+                                <TextBlock Text="Configure daemon behavior, wireless parameters &amp; inspect real-time log stream" FontSize="10.5" Foreground="{StaticResource TextDim}"/>
+                            </StackPanel>
+
+                            <UniformGrid Grid.Row="1" Columns="2" VerticalAlignment="Top">
+                                <!-- Behavior Settings -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="APP BEHAVIOR &amp; DAEMON" Foreground="{StaticResource AccentBlue}" FontWeight="Bold" Margin="0,0,0,15"/>
+                                        <Grid Margin="0,6">
+                                            <TextBlock Text="Run on Windows Startup" Foreground="White" FontSize="12.5"/>
+                                            <ToggleButton x:Name="AutoStartToggle" Visibility="Collapsed"/>
+                                            <ToggleButton x:Name="SettingsAutoStart" Style="{StaticResource FlatToggle}" HorizontalAlignment="Right" IsChecked="{Binding IsChecked, ElementName=AutoStartToggle, Mode=TwoWay}"/>
+                                        </Grid>
+                                        <Grid Margin="0,10,0,6">
+                                            <TextBlock Text="Minimize to System Tray" Foreground="White" FontSize="12.5"/>
+                                            <ToggleButton x:Name="TrayToggle" Visibility="Collapsed"/>
+                                            <ToggleButton x:Name="SettingsTray" Style="{StaticResource FlatToggle}" HorizontalAlignment="Right" IsChecked="{Binding IsChecked, ElementName=TrayToggle, Mode=TwoWay}"/>
+                                        </Grid>
+                                        <Grid Margin="0,10,0,6">
+                                            <TextBlock Text="Hardware Monitoring Sensors" Foreground="White" FontSize="12.5"/>
+                                            <ToggleButton x:Name="MonitoringToggle" Style="{StaticResource FlatToggle}" HorizontalAlignment="Right" IsChecked="True" Click="MonitoringToggle_Click"/>
+                                        </Grid>
+                                        <Grid Margin="0,10,0,6">
+                                            <TextBlock Text="Caffeine Mode (Prevent Sleep)" Foreground="White" FontSize="12.5"/>
+                                            <ToggleButton x:Name="CaffeineToggle" Style="{StaticResource FlatToggle}" HorizontalAlignment="Right" Click="CaffeineToggle_Click"/>
+                                        </Grid>
+                                        <Grid Margin="0,10,0,6">
+                                            <TextBlock Text="Compact Mode (Mini Widget)" Foreground="White" FontSize="12.5"/>
+                                            <ToggleButton x:Name="CompactModeToggle" Style="{StaticResource FlatToggle}" HorizontalAlignment="Right" Click="CompactModeToggle_Click"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Telemetry & Diagnostics -->
+                                <Border Style="{StaticResource CardBorderStyle}" Margin="6">
+                                    <StackPanel>
+                                        <TextBlock Text="TELEMETRY &amp; HARDWARE SENSING" Foreground="{StaticResource AccentOrange}" FontWeight="Bold" Margin="0,0,0,15"/>
+                                        <TextBlock Text="Sensor Polling Frequency (Seconds):" Foreground="White" FontSize="12" Margin="0,0,0,8"/>
+                                        <Slider x:Name="UpdateRateSlider" Style="{StaticResource GlassSlider}" Minimum="1" Maximum="10" Value="2" TickFrequency="1" IsSnapToTickEnabled="True"/>
+                                        <Button Content="&#x1F9F9; CLEAN SYSTEM TEMP" Click="Macro_Click" Tag="cleartemp" Style="{StaticResource NeonBtn}" Margin="0,18,0,0"/>
+                                        <Button x:Name="StressTestBtn" Content="&#x26A1; RUN HARDWARE STRESS TEST" Click="StressTest_Click" Style="{StaticResource NeonBtn}" Margin="0,10,0,0" BorderBrush="{StaticResource AccentRed}" Foreground="{StaticResource AccentRed}"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <!-- Live Activity Log -->
+                            <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Margin="6,15,6,10" Height="220">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <TextBlock Text="ACTIVITY &amp; NETWORK CONSOLE LOG" Foreground="{StaticResource AccentPurple}" FontWeight="Bold" FontSize="12"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button Content="&#x1F4CB; COPY LOG" Click="CopyLog_Click" Style="{StaticResource NeonBtn}" Margin="0,0,8,0" Padding="10,3" FontSize="9.5"/>
+                                            <Button Content="&#x1F9F9; CLEAR" Click="ClearLog_Click" Style="{StaticResource NeonBtn}" Padding="10,3" FontSize="9.5"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl x:Name="LogList" Background="#050A14">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                        <TextBlock Text="{Binding TimeText}" Foreground="{StaticResource AccentBlue}" FontSize="10" FontFamily="Consolas" Width="65"/>
+                                                        <TextBlock Text="{Binding Message}" Foreground="{StaticResource TextDim}" FontSize="10" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Dedicated Mini Mode Container (Compact Widget) -->
+            <ScrollViewer x:Name="MiniModeContainer" Visibility="Collapsed"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          CanContentScroll="False"
+                          PanningMode="VerticalOnly"
+                          PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                          Margin="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Mini Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="28" Height="28" CornerRadius="8">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#00D2FF" Offset="0"/>
+                                        <GradientStop Color="#BF5AF2" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <TextBlock Text="PC" Foreground="White" FontSize="12" FontWeight="Black" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="PC MASTER" Foreground="White" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            <Border Background="#0E1A30" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="6" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="MINI" Foreground="{StaticResource AccentBlue}" FontSize="9" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Mini Controls -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button Content="&#x1F5D6;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentBlue}" BorderThickness="0" Width="32" Height="26" Click="CompactModeBtn_Click" ToolTip="Expand to Full UI" Cursor="Hand"/>
+                            <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="30" Height="26" Click="MinimizeButton_Click" ToolTip="Minimize" Cursor="Hand"/>
+                            <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentRed}" BorderThickness="0" Width="30" Height="26" Click="CloseButton_Click" ToolTip="Close" Cursor="Hand"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Status & IP Pill -->
+                    <Border Grid.Row="1" Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="12" Padding="12,8" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="ConnectionIndicatorMini" Width="8" Height="8" Fill="{StaticResource AccentRed}" Margin="0,0,8,0">
+                                <Ellipse.Effect>
+                                        <DropShadowEffect x:Name="ConnectionGlowMini" BlurRadius="10" Color="#FF453A" ShadowDepth="0" Opacity="0.8"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                                <TextBlock x:Name="DeviceNameTextMini" Text="NOT CONNECTED" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1" x:Name="LocalIpTextMini" Text="127.0.0.1:8099" Foreground="{StaticResource AccentBlue}" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 4 Telemetry Cards (2x2 Grid) -->
+                    <UniformGrid Grid.Row="2" Columns="2" Margin="0,0,0,12">
+                        <!-- CPU Card -->
+                        <Border Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="10" Margin="3">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="CPU" Foreground="{StaticResource AccentBlue}" FontSize="11" FontWeight="Bold"/>
+                                        <TextBlock x:Name="CpuTempTextMini" Text="--&#x00B0;C" Foreground="{StaticResource TextDim}" FontSize="10" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="CpuUsageTextMini" Text="0%" Foreground="White" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar x:Name="CpuBarMini" Height="4" Minimum="0" Maximum="100" Value="0" Foreground="{StaticResource AccentBlue}" Background="#13223B" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- GPU Card -->
+                        <Border Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="10" Margin="3">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="GPU" Foreground="{StaticResource AccentPurple}" FontSize="11" FontWeight="Bold"/>
+                                        <TextBlock x:Name="GpuTempTextMini" Text="--&#x00B0;C" Foreground="{StaticResource TextDim}" FontSize="10" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="GpuUsageTextMini" Text="0%" Foreground="White" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar x:Name="GpuBarMini" Height="4" Minimum="0" Maximum="100" Value="0" Foreground="{StaticResource AccentPurple}" Background="#13223B" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- RAM Card -->
+                        <Border Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="10" Margin="3">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="RAM" Foreground="{StaticResource AccentOrange}" FontSize="11" FontWeight="Bold"/>
+                                        <TextBlock x:Name="RamAvailTextMini" Text="-- Free" Foreground="{StaticResource TextDim}" FontSize="10" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="RamUsageTextMini" Text="0%" Foreground="White" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar x:Name="RamBarMini" Height="4" Minimum="0" Maximum="100" Value="0" Foreground="{StaticResource AccentOrange}" Background="#13223B" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- FAN Card -->
+                        <Border Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="10" Margin="3">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="FAN" Foreground="{StaticResource AccentGreen}" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock x:Name="FanSpeedTextMini" Text="0 RPM" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar x:Name="FanBarMini" Height="4" Minimum="0" Maximum="100" Value="0" Foreground="{StaticResource AccentGreen}" Background="#13223B" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- Quick Action Buttons -->
+                    <Border Grid.Row="3" Background="#0B1528" BorderBrush="#1A2D4A" BorderThickness="1" CornerRadius="14" Padding="8" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="QUICK ACTIONS" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold" Margin="4,0,0,6"/>
+                            <UniformGrid Columns="4">
+                                <Button Content="LOCK" Click="RemoteCmd_Click" Tag="lock" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                <Button Content="SLEEP" Click="RemoteCmd_Click" Tag="sleep" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                <Button Content="MUTE" Click="RemoteCmd_Click" Tag="mute" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                                <Button Content="BOOST" Click="Macro_Click" Tag="boostram" Style="{StaticResource NeonBtn}" Padding="4,6" Margin="2" FontSize="10"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Gaming Mode Toggle (Mini) -->
+                    <ToggleButton Grid.Row="4" x:Name="GamingModeToggleMini" Click="GamingModeToggle_Click" Height="44" Cursor="Hand" Margin="0,0,0,10">
+                        <ToggleButton.Template>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Border x:Name="miniBorder" CornerRadius="12" BorderThickness="1" BorderBrush="#1A2D4A" Background="#0B1528">
+                                    <Grid VerticalAlignment="Center" Margin="12,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="&#x1F3AE;" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="1" x:Name="miniGamingText" Text="GAMING MODE" Foreground="White" FontSize="11" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <Border Grid.Column="2" x:Name="miniPill" CornerRadius="6" Background="#13223B" Padding="6,2">
+                                            <TextBlock x:Name="miniPillText" Text="OFF" Foreground="{StaticResource TextDim}" FontSize="9" FontWeight="Bold"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="miniBorder" Property="Background" Value="{StaticResource NeonBtnGradient}"/>
+                                        <Setter TargetName="miniBorder" Property="BorderBrush" Value="{StaticResource AccentBlue}"/>
+                                        <Setter TargetName="miniPill" Property="Background" Value="#FFFFFF"/>
+                                        <Setter TargetName="miniPillText" Property="Text" Value="ACTIVE"/>
+                                        <Setter TargetName="miniPillText" Property="Foreground" Value="#050A14"/>
+                                        <Setter TargetName="miniGamingText" Property="Text" Value="GAMING OPTIMIZED"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ToggleButton.Template>
+                    </ToggleButton>
+
+                    <!-- Wireless Hub & Pairing Row (Mini) -->
+                    <Grid Grid.Row="5" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="StartFileServerButtonMini" Content="START HUB" Click="StartFileServerButton_Click" Padding="8,8" FontSize="11" Margin="0,0,6,0">
+                            <Button.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource NeonBtn}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Tag" Value="Started">
+                                            <Setter Property="Background" Value="#3032D74B"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                            <Setter Property="Content" Value="HUB ACTIVE (8099)"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                        <Button Grid.Column="1" Content="&#x1F4F1; QR" Click="ShowPairingQR_Click" Style="{StaticResource NeonBtn}" Padding="12,8" FontSize="11" ToolTip="Pair Mobile Device"/>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- Desktop Notification Toast Banner (Bottom-Right) -->
+            <Border x:Name="DesktopNotifToast" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Margin="0,0,24,24" CornerRadius="16" Width="360" Visibility="Collapsed"
+                    Background="#F507101F" BorderBrush="#3300D2FF" BorderThickness="1.5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" Color="#00D2FF" ShadowDepth="4" Opacity="0.5"/>
+                </Border.Effect>
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- App Name & Dismiss -->
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Background="#1500D2FF" CornerRadius="6" Padding="6,2" Margin="0,0,8,0">
+                                <TextBlock x:Name="ToastAppName" Text="PHONE MESSAGE" Foreground="{StaticResource AccentBlue}" FontSize="10" FontWeight="Bold"/>
+                            </Border>
+                            <TextBlock Text="NEW NOTIFICATION" Foreground="{StaticResource TextDim}" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Content="&#x2715;" Click="CloseToast_Click" HorizontalAlignment="Right" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Cursor="Hand" FontSize="12"/>
+                    </Grid>
+
+                    <!-- Title (Sender) -->
+                    <TextBlock Grid.Row="1" x:Name="ToastTitle" Text="Sender Name" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0,8,0,2"/>
+
+                    <!-- Content (Message) -->
+                    <TextBlock Grid.Row="2" x:Name="ToastContent" Text="Message preview..." Foreground="{StaticResource TextDim}" FontSize="12" TextWrapping="Wrap" MaxHeight="60" Margin="0,0,0,10"/>
+
+                    <!-- Inline Reply Box -->
+                    <Grid Grid.Row="3" x:Name="ToastReplyGrid">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="ToastReplyBox" Background="#0B1528" Foreground="White" BorderBrush="#1A2D4A" BorderThickness="1" Padding="8,6" FontSize="12" KeyDown="ToastReplyBox_KeyDown"/>
+                        <Button Grid.Column="1" Content="REPLY" Click="ToastReply_Click" Style="{StaticResource NeonBtn}" Padding="12,6" Margin="6,0,0,0" FontSize="11" FontWeight="Bold"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Title Bar Buttons (Standard Mode) -->
+            <StackPanel x:Name="FullTitleBarButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,12,0">
+                <Button x:Name="CompactModeBtn" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="CompactModeBtn_Click" ToolTip="Switch to Mini Mode (Compact Widget)" Cursor="Hand"/>
+                <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="MinimizeButton_Click" ToolTip="Minimize" Cursor="Hand"/>
+                <Button Content="&#x1F5D6;" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="MaximizeButton_Click" ToolTip="Maximize / Restore" Cursor="Hand"/>
+                <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentRed}" BorderThickness="0" Width="36" Height="28" Click="CloseButton_Click" ToolTip="Close" Cursor="Hand"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

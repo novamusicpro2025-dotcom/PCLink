@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PC Master | Liquid Glass Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #03050C;
+            --glass-card: rgba(18, 24, 42, 0.45);
+            --glass-card-hover: rgba(28, 36, 62, 0.6);
+            --glass-specular: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-glow: rgba(0, 210, 255, 0.15);
+            --glass-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+
+            --accent-cyan: #00D2FF;
+            --accent-purple: #BF5AF2;
+            --accent-emerald: #00FF88;
+            --accent-amber: #FF9F0A;
+            --accent-ruby: #FF453A;
+            --accent-pink: #FF375F;
+            
+            --text-pure: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.72);
+            --text-dim: rgba(255, 255, 255, 0.45);
+            --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-deep);
+            color: var(--text-pure);
+            overflow-x: hidden;
+            padding-bottom: 100px;
+            min-height: 100vh;
+            position: relative;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === Fluid Ambient Animated Liquid Orbs === */
+        .ambient-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .liquid-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.28;
+            animation: floatOrb 22s infinite alternate ease-in-out;
+        }
+        .orb-1 {
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, var(--accent-cyan) 0%, rgba(0,210,255,0) 70%);
+            top: -60px; left: -60px;
+        }
+        .orb-2 {
+            width: 440px; height: 440px;
+            background: radial-gradient(circle, var(--accent-purple) 0%, rgba(191,90,242,0) 70%);
+            top: 30%; right: -100px;
+            animation-duration: 26s;
+            animation-delay: -5s;
+        }
+        .orb-3 {
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, var(--accent-emerald) 0%, rgba(0,255,136,0) 70%);
+            bottom: 40px; left: 10%;
+            animation-duration: 20s;
+            animation-delay: -10s;
+        }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, 30px) scale(1.08); }
+            100% { transform: translate(-30px, -20px) scale(0.95); }
+        }
+
+        /* === Container === */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* === iPhone Dynamic Island Glass Top Bar === */
+        .dynamic-island {
+            background: rgba(12, 16, 28, 0.75);
+            backdrop-filter: blur(32px) saturate(210%) brightness(110%);
+            -webkit-backdrop-filter: blur(32px) saturate(210%) brightness(110%);
+            border: 1px solid var(--glass-border);
+            border-top: 1.5px solid var(--glass-specular);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 28px;
+            padding: 10px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.3);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .dynamic-island:hover {
+            border-color: rgba(255, 255, 255, 0.22);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 20px var(--glass-glow);
+        }
+
+        .island-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pulse-indicator {
+            position: relative;
+            width: 12px; height: 12px;
+        }
+        .pulse-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--accent-ruby);
+            position: absolute;
+            top: 1px; left: 1px;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .pulse-dot.connected {
+            background: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
+        }
+        .pulse-ring {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--accent-ruby);
+            opacity: 0.5;
+            animation: pulseWave 2s infinite;
+        }
+        .pulse-dot.connected + .pulse-ring {
+            background: var(--accent-emerald);
+        }
+        @keyframes pulseWave {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        .brand-titles h1 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #00D2FF 0%, #BF5AF2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+        .brand-titles span {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        /* IP Pill */
+        .ip-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 20px;
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .ip-pill:active {
+            transform: scale(0.94);
+            background: rgba(0, 210, 255, 0.18);
+        }
+        .ip-text {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-pure);
+            letter-spacing: 0.3px;
+        }
+        .ip-copy-badge {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #000;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .island-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .latency-badge {
+            font-size: 10px;
+            color: var(--accent-emerald);
+            font-weight: 700;
+        }
+
+        /* === Tab Navigation Bar === */
+        .tabs-scroller {
+            display: flex;
+            gap: 8px;
+            padding: 4px 2px 18px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .tabs-scroller::-webkit-scrollbar { display: none; }
+
+        .glass-tab {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .glass-tab:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .glass-tab.active {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.35) 0%, rgba(191, 90, 242, 0.35) 100%);
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.7);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0, 210, 255, 0.3), inset 0 1px 1px rgba(255,255,255,0.4);
+        }
+
+        /* === Panels === */
+        .panel {
+            display: none;
+            animation: fadeInPanel 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .panel.active { display: block; }
+        @keyframes fadeInPanel {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === Liquid Mirror Glass Cards === */
+        .glass-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(28px) saturate(210%) brightness(112%);
+            -webkit-backdrop-filter: blur(28px) saturate(210%) brightness(112%);
+            border: 1px solid var(--glass-border);
+            border-top: 1.5px solid var(--glass-specular);
+            border-left: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .glass-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 24px 24px 0 0;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title.purple { color: var(--accent-purple); }
+        .card-title.emerald { color: var(--accent-emerald); }
+        .card-title.amber { color: var(--accent-amber); }
+        .card-title.ruby { color: var(--accent-ruby); }
+
+        .card-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-secondary);
+        }
+
+        /* === 4 Activity Rings Grid === */
+        .rings-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .ring-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(24px) saturate(200%);
+            -webkit-backdrop-filter: blur(24px) saturate(200%);
+            border: 1px solid var(--glass-border);
+            border-top: 1.5px solid var(--glass-specular);
+            border-radius: 20px;
+            padding: 12px 6px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            position: relative;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .ring-card:hover { transform: translateY(-2px); }
+
+        .svg-ring-wrap {
+            width: 58px; height: 58px;
+            margin: 0 auto 6px;
+            position: relative;
+        }
+        .svg-ring-wrap svg {
+            transform: rotate(-90deg);
+            width: 100%; height: 100%;
+        }
+        .svg-ring-wrap circle {
+            fill: none;
+            stroke-width: 4.5;
+            stroke-linecap: round;
+        }
+        .ring-bg-track { stroke: rgba(255, 255, 255, 0.08); }
+        .ring-val-track {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .ring-val-track.cyan { stroke: var(--accent-cyan); filter: drop-shadow(0 0 6px rgba(0,210,255,0.6)); }
+        .ring-val-track.purple { stroke: var(--accent-purple); filter: drop-shadow(0 0 6px rgba(191,90,242,0.6)); }
+        .ring-val-track.amber { stroke: var(--accent-amber); filter: drop-shadow(0 0 6px rgba(255,159,10,0.6)); }
+        .ring-val-track.emerald { stroke: var(--accent-emerald); filter: drop-shadow(0 0 6px rgba(0,255,136,0.6)); }
+
+        .ring-center-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .ring-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ring-sub {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        /* === Chunky iOS Sliders === */
+        .slider-group {
+            margin-bottom: 14px;
+        }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .slider-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .slider-value {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .chunky-slider-track {
+            position: relative;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 19px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .chunky-slider-fill {
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            background: linear-gradient(90deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+            border-radius: 19px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 16px rgba(0, 210, 255, 0.4);
+        }
+        .chunky-slider-fill.amber {
+            background: linear-gradient(90deg, #FF9F0A 0%, #FFD60A 100%);
+            box-shadow: 0 0 16px rgba(255, 159, 10, 0.4);
+        }
+        .slider-input-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 5;
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .slider-content-overlay {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 14px;
+            pointer-events: none;
+        }
+        .slider-icon {
+            font-size: 15px;
+            color: #fff;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+        }
+
+        /* Preset Pills */
+        .pills-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .glass-pill {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            padding: 8px 4px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .glass-pill:hover { background: rgba(255, 255, 255, 0.14); }
+        .glass-pill:active { transform: scale(0.95); background: var(--accent-cyan); color: #000; }
+
+        /* === Media Controls Hub === */
+        .media-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
+            padding: 10px 14px;
+            margin-top: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .media-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            width: 44px; height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .media-btn:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
+        .media-btn:active { transform: scale(0.92); }
+        .media-btn.play-main {
+            width: 52px; height: 52px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #000;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(0, 210, 255, 0.35);
+        }
+
+        /* === Smart Sleep & Countdown Timer === */
+        .countdown-display {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .countdown-time {
+            font-size: 26px;
+            font-weight: 800;
+            font-family: monospace;
+            letter-spacing: 2px;
+            color: var(--accent-amber);
+            text-shadow: 0 0 12px rgba(255, 159, 10, 0.5);
+        }
+        .countdown-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 2px;
+        }
+
+        /* === 1-Tap System Optimizer Grid === */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .tool-tile {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.28);
+            border-radius: 18px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .tool-tile:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.5), 0 0 12px var(--glass-glow);
+        }
+        .tool-tile:active {
+            transform: scale(0.93);
+            background: linear-gradient(135deg, rgba(0,210,255,0.3), rgba(191,90,242,0.3));
+        }
+        .tool-icon {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .tool-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        /* === Springboard App Launcher Dock === */
+        .springboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .app-icon-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 14px 6px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .app-icon-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 16px rgba(191,90,242,0.3);
+        }
+        .app-icon-card:active {
+            transform: scale(0.92);
+        }
+        .app-squircle {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .app-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 68px;
+        }
+
+        /* App Squircle Colors */
+        .bg-cyan { background: linear-gradient(135deg, #00D2FF, #0072FF); color: #fff; }
+        .bg-purple { background: linear-gradient(135deg, #BF5AF2, #5856D6); color: #fff; }
+        .bg-emerald { background: linear-gradient(135deg, #00FF88, #00B050); color: #000; }
+        .bg-amber { background: linear-gradient(135deg, #FF9F0A, #FF3B30); color: #fff; }
+        .bg-blue { background: linear-gradient(135deg, #0A84FF, #0040DD); color: #fff; }
+        .bg-pink { background: linear-gradient(135deg, #FF375F, #CC0033); color: #fff; }
+        .bg-dark { background: linear-gradient(135deg, #2C2C2E, #1C1C1E); color: #fff; }
+
+        /* === Master Gaming Bar === */
+        .gaming-glow-card {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(191, 90, 242, 0.2) 100%);
+            border: 1.5px solid rgba(0, 210, 255, 0.5);
+            border-radius: 22px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 8px 28px rgba(0, 210, 255, 0.25), inset 0 1px 1px rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+            transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .gaming-glow-card:active { transform: scale(0.97); }
+        .gaming-glow-card.active {
+            background: linear-gradient(135deg, rgba(255, 69, 58, 0.25) 0%, rgba(191, 90, 242, 0.25) 100%);
+            border-color: rgba(255, 69, 58, 0.6);
+            box-shadow: 0 8px 28px rgba(255, 69, 58, 0.35);
+        }
+        .gaming-info h3 {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+        .gaming-info p {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .gaming-badge {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        /* === Touchpad Area === */
+        .touchpad-box {
+            background: rgba(10, 14, 26, 0.6);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            touch-action: none;
+            cursor: crosshair;
+            margin-bottom: 14px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .touchpad-box.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 210, 255, 0.05);
+        }
+        .touchpad-instructions {
+            text-align: center;
+            pointer-events: none;
+            color: var(--text-dim);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .touchpad-instructions .icon {
+            font-size: 36px;
+            margin-bottom: 6px;
+            opacity: 0.4;
+            display: block;
+        }
+        .mouse-pedals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .pedal-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+            border-radius: 18px;
+            padding: 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .pedal-btn:active {
+            transform: scale(0.94);
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        /* === Mirror Viewport === */
+        .mirror-container {
+            position: relative;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+            margin-bottom: 14px;
+        }
+        #mirror-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            touch-action: none;
+            user-select: none;
+        }
+        .mirror-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(20, 25, 42, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 10px 14px;
+            border-radius: 0 0 20px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* === Process Killer & Lists === */
+        .proc-search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 14px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 12px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            outline: none;
+        }
+        .proc-search-input:focus { border-color: var(--accent-cyan); }
+        .process-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+        }
+        .process-item:hover { background: rgba(255, 255, 255, 0.09); }
+        .proc-info .name { font-size: 12px; font-weight: 700; color: #fff; }
+        .proc-info .meta { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+        .kill-btn {
+            background: rgba(255, 69, 58, 0.2);
+            border: 1px solid rgba(255, 69, 58, 0.4);
+            color: var(--accent-ruby);
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .kill-btn:active { background: var(--accent-ruby); color: #fff; transform: scale(0.92); }
+
+        /* === Toast Notification === */
+        .toast {
+            position: fixed;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(16, 22, 38, 0.92);
+            backdrop-filter: blur(28px) saturate(200%);
+            -webkit-backdrop-filter: blur(28px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.4);
+            border-radius: 22px;
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 16px var(--glass-glow);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 10000;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.error {
+            border-color: rgba(255, 69, 58, 0.5);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 16px rgba(255, 69, 58, 0.4);
+        }
+        .toast.success {
+            border-color: rgba(0, 255, 136, 0.5);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 16px rgba(0, 255, 136, 0.4);
+        }
+
+        /* === Floating Glass Dock Nav Bar (Bottom) === */
+        .glass-dock {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 28px);
+            max-width: 580px;
+            background: rgba(14, 18, 32, 0.72);
+            backdrop-filter: blur(32px) saturate(220%) brightness(115%);
+            -webkit-backdrop-filter: blur(32px) saturate(220%) brightness(115%);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.45);
+            border-radius: 32px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.65), inset 0 1px 1px rgba(255,255,255,0.3);
+            z-index: 999;
+        }
+        .dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            color: var(--text-dim);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .dock-item:hover { color: #fff; }
+        .dock-item:active { transform: scale(0.9); }
+        .dock-item.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
+        }
+        .dock-icon { font-size: 18px; line-height: 1; }
+        .dock-label { font-size: 9px; font-weight: 700; letter-spacing: 0.3px; }
+
+        /* Fullscreen mirror exit */
+        .fullscreen-exit-btn {
+            position: fixed;
+            top: 16px; right: 16px;
+            z-index: 10001;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        body.mirror-fullscreen .fullscreen-exit-btn { display: flex; }
+        body.mirror-fullscreen .dynamic-island,
+        body.mirror-fullscreen .tabs-scroller,
+        body.mirror-fullscreen .glass-dock {
+            display: none !important;
+        }
+        body.mirror-fullscreen #mirror-panel {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            margin: 0; padding: 0;
+            z-index: 9999;
+            background: #000;
+        }
+        body.mirror-fullscreen .mirror-container {
+            border-radius: 0; border: none; height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Liquid Orbs -->
+    <div class="ambient-mesh">
+        <div class="liquid-orb orb-1"></div>
+        <div class="liquid-orb orb-2"></div>
+        <div class="liquid-orb orb-3"></div>
+    </div>
+
+    <!-- Exit Fullscreen Button -->
+    <button class="fullscreen-exit-btn" onclick="toggleFullscreen(false)" title="Exit Fullscreen">✕</button>
+
+    <div class="app-container">
+
+        <!-- iPhone Dynamic Island Glass Top Bar -->
+        <div class="dynamic-island">
+            <div class="island-brand">
+                <div class="pulse-indicator">
+                    <div class="pulse-dot" id="conn-dot"></div>
+                    <div class="pulse-ring"></div>
+                </div>
+                <div class="brand-titles">
+                    <h1 id="island-title">PC MASTER</h1>
+                    <span id="conn-status">CONNECTING...</span>
+                </div>
+            </div>
+
+            <!-- Prominent IP:Port Pill with 1-Click Copy -->
+            <div class="ip-pill" onclick="copyIpAddress()" title="Tap to copy IP:Port address">
+                <span style="font-size: 12px;">🌐</span>
+                <span class="ip-text" id="ip-address-display">10.145.56.60:8099</span>
+                <span class="ip-copy-badge" id="ip-copy-badge">COPY</span>
+            </div>
+
+            <div class="island-status">
+                <span class="latency-badge" id="latency-val">⚡ 4ms</span>
+            </div>
+        </div>
+
+        <!-- Scrollable Top Tabs Bar -->
+        <div class="tabs-scroller">
+            <div class="glass-tab active" data-panel="dashboard" onclick="showPanel('dashboard')">⚡ Dashboard</div>
+            <div class="glass-tab" data-panel="control" onclick="showPanel('control')">🎛️ Control Center</div>
+            <div class="glass-tab" data-panel="touchpad" onclick="showPanel('touchpad')">🖱️ Touchpad</div>
+            <div class="glass-tab" data-panel="mirror" onclick="showPanel('mirror')">📺 Live Screen</div>
+            <div class="glass-tab" data-panel="apps" onclick="showPanel('apps')">🚀 App Launcher</div>
+            <div class="glass-tab" data-panel="tools" onclick="showPanel('tools')">🛠️ Tools &amp; Procs</div>
+            <div class="glass-tab" data-panel="files" onclick="showPanel('files')">📁 Shared Files</div>
+        </div>
+
+        <!-- ================= PANEL 1: DASHBOARD ================= -->
+        <div id="dashboard-panel" class="panel active">
+
+            <!-- 4 Activity Rings (CPU, GPU, RAM, Storage) -->
+            <div class="rings-grid">
+                <!-- CPU Ring -->
+                <div class="ring-card">
+                    <div class="svg-ring-wrap">
+                        <svg viewBox="0 0 36 36">
+                            <circle class="ring-bg-track" cx="18" cy="18" r="15.9155"></circle>
+                            <circle class="ring-val-track cyan" id="cpu-circle" cx="18" cy="18" r="15.9155"></circle>
+                        </svg>
+                        <div class="ring-center-text" id="cpu-val">0%</div>
+                    </div>
+                    <div class="ring-label">CPU</div>
+                    <div class="ring-sub" id="cpu-temp">--°C</div>
+                </div>
+
+                <!-- GPU Ring -->
+                <div class="ring-card">
+                    <div class="svg-ring-wrap">
+                        <svg viewBox="0 0 36 36">
+                            <circle class="ring-bg-track" cx="18" cy="18" r="15.9155"></circle>
+                            <circle class="ring-val-track purple" id="gpu-circle" cx="18" cy="18" r="15.9155"></circle>
+                        </svg>
+                        <div class="ring-center-text" id="gpu-val">0%</div>
+                    </div>
+                    <div class="ring-label">GPU</div>
+                    <div class="ring-sub" id="gpu-temp">--°C</div>
+                </div>
+
+                <!-- RAM Ring -->
+                <div class="ring-card">
+                    <div class="svg-ring-wrap">
+                        <svg viewBox="0 0 36 36">
+                            <circle class="ring-bg-track" cx="18" cy="18" r="15.9155"></circle>
+                            <circle class="ring-val-track amber" id="ram-circle" cx="18" cy="18" r="15.9155"></circle>
+                        </svg>
+                        <div class="ring-center-text" id="ram-pct">0%</div>
+                    </div>
+                    <div class="ring-label">RAM</div>
+                    <div class="ring-sub" id="ram-text">0 / 0 GB</div>
+                </div>
+
+                <!-- Storage Ring -->
+                <div class="ring-card">
+                    <div class="svg-ring-wrap">
+                        <svg viewBox="0 0 36 36">
+                            <circle class="ring-bg-track" cx="18" cy="18" r="15.9155"></circle>
+                            <circle class="ring-val-track emerald" id="storage-circle" cx="18" cy="18" r="15.9155"></circle>
+                        </svg>
+                        <div class="ring-center-text" id="storage-pct">0%</div>
+                    </div>
+                    <div class="ring-label">DISK</div>
+                    <div class="ring-sub" id="storage-text">0 / 0 GB</div>
+                </div>
+            </div>
+
+            <!-- Master Gaming Mode Glow Banner -->
+            <div class="gaming-glow-card" id="gaming-btn" onclick="cmd('gaming')">
+                <div class="gaming-info">
+                    <h3 id="gaming-title">🎮 MASTER GAMING MODE</h3>
+                    <p id="gaming-sub">Max CPU/GPU priority • DND Toasts muted</p>
+                </div>
+                <div class="gaming-badge" id="gaming-badge">OFF</div>
+            </div>
+
+            <!-- iOS Sound & Display Hub Card -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">🔊 Sound &amp; Display Control</div>
+                    <div class="card-badge" id="vol-display-badge">75% Vol</div>
+                </div>
+
+                <!-- Master Volume Slider -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-title"><span>🔊</span> Master Volume</span>
+                        <span class="slider-value" id="vol-text">75%</span>
+                    </div>
+                    <div class="chunky-slider-track" id="vol-track">
+                        <div class="chunky-slider-fill" id="vol-fill" style="width: 75%;"></div>
+                        <input type="range" min="0" max="100" value="75" class="slider-input-overlay" id="vol-slider" oninput="onVolumeInput(this.value)" onchange="onVolumeChange(this.value)">
+                        <div class="slider-content-overlay">
+                            <span class="slider-icon">🔈</span>
+                            <span class="slider-icon">🔊</span>
+                        </div>
+                    </div>
+                    <div class="pills-row">
+                        <div class="glass-pill" onclick="setVolumeLevel(100)">100%</div>
+                        <div class="glass-pill" onclick="setVolumeLevel(75)">75%</div>
+                        <div class="glass-pill" onclick="setVolumeLevel(50)">50%</div>
+                        <div class="glass-pill" onclick="setVolumeLevel(25)">25%</div>
+                        <div class="glass-pill" onclick="cmd('mute')" style="color: var(--accent-ruby);">🔇 Mute</div>
+                    </div>
+                </div>
+
+                <!-- Display Brightness Slider -->
+                <div class="slider-group" style="margin-top: 14px;">
+                    <div class="slider-header">
+                        <span class="slider-title"><span>☀️</span> Screen Brightness</span>
+                        <span class="slider-value" id="brightness-label">100%</span>
+                    </div>
+                    <div class="chunky-slider-track" id="bright-track">
+                        <div class="chunky-slider-fill amber" id="bright-fill" style="width: 100%;"></div>
+                        <input type="range" min="0" max="100" value="100" class="slider-input-overlay" id="brightness-slider" oninput="onBrightnessInput(this.value)" onchange="onBrightnessChange(this.value)">
+                        <div class="slider-content-overlay">
+                            <span class="slider-icon">🌑</span>
+                            <span class="slider-icon">☀️</span>
+                        </div>
+                    </div>
+                    <div class="pills-row">
+                        <div class="glass-pill" onclick="cmd('monoff')">🌑 Screen Off</div>
+                        <div class="glass-pill" onclick="setBrightness(100)">100%</div>
+                        <div class="glass-pill" onclick="setBrightness(50)">50%</div>
+                        <div class="glass-pill" onclick="setBrightness(20)">20%</div>
+                    </div>
+                </div>
+
+                <!-- Quick Media Transport -->
+                <div class="media-bar">
+                    <button class="media-btn" onclick="cmd('prev')" title="Previous Track">⏮️</button>
+                    <button class="media-btn play-main" onclick="cmd('playpause')" title="Play / Pause">⏯️</button>
+                    <button class="media-btn" onclick="cmd('next')" title="Next Track">⏭️</button>
+                    <button class="media-btn" onclick="cmd('voldown')" title="Volume Down">🔉</button>
+                    <button class="media-btn" onclick="cmd('volup')" title="Volume Up">🔊</button>
+                </div>
+            </div>
+
+            <!-- Smart Sleep & Countdown Timer Card -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title amber">⏰ Smart Sleep &amp; Shutdown Timer</div>
+                    <div class="card-badge" id="timer-badge">INACTIVE</div>
+                </div>
+                <div class="countdown-display">
+                    <div class="countdown-time" id="countdown-clock">00:00:00</div>
+                    <div class="countdown-label" id="countdown-status">NO TIMER ACTIVE</div>
+                </div>
+                <div class="pills-row">
+                    <div class="glass-pill" onclick="scheduleTimer('shutdown', 15)">15M</div>
+                    <div class="glass-pill" onclick="scheduleTimer('shutdown', 30)">30M</div>
+                    <div class="glass-pill" onclick="scheduleTimer('shutdown', 45)">45M</div>
+                    <div class="glass-pill" onclick="scheduleTimer('shutdown', 60)">60M</div>
+                    <div class="glass-pill" onclick="scheduleTimer('shutdown', 120)">2H</div>
+                    <div class="glass-pill" onclick="cancelTimer()" style="color: var(--accent-ruby); border-color: rgba(255,69,58,0.4);">❌ CANCEL</div>
+                </div>
+            </div>
+
+            <!-- 1-Tap System Optimizer Suite -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title emerald">🚀 1-Tap System Optimizer Suite</div>
+                </div>
+                <div class="tools-grid">
+                    <div class="tool-tile" onclick="cmd('emptytrash')">
+                        <span class="tool-icon">🗑️</span>
+                        <span class="tool-name">Empty Trash</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('cleartemp')">
+                        <span class="tool-icon">🧹</span>
+                        <span class="tool-name">Clean Temp</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('flushdns')">
+                        <span class="tool-icon">🌐</span>
+                        <span class="tool-name">Flush DNS</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('boostram')">
+                        <span class="tool-icon">🚀</span>
+                        <span class="tool-name">Boost RAM</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('restartexp')">
+                        <span class="tool-icon">🔄</span>
+                        <span class="tool-name">Restart Shell</span>
+                    </div>
+                    <div class="tool-tile" onclick="toggleCaffeine()">
+                        <span class="tool-icon" id="caffeine-icon">☕</span>
+                        <span class="tool-name" id="caffeine-name">Caffeine</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('toggledark')">
+                        <span class="tool-icon">🌙</span>
+                        <span class="tool-name">Dark Theme</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('audiofix')">
+                        <span class="tool-icon">🔊</span>
+                        <span class="tool-name">Audio Fix</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- iOS Springboard Quick App Launcher -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title purple">📱 Springboard App Launcher</div>
+                </div>
+                <div class="springboard-grid">
+                    <div class="app-icon-card" onclick="cmd('taskmgr')">
+                        <div class="app-squircle bg-cyan">📊</div>
+                        <span class="app-label">Task Mgr</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('cmd')">
+                        <div class="app-squircle bg-dark">💻</div>
+                        <span class="app-label">CMD Admin</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('powershell')">
+                        <div class="app-squircle bg-blue">⚡</div>
+                        <span class="app-label">PowerShell</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('calc')">
+                        <div class="app-squircle bg-amber">🧮</div>
+                        <span class="app-label">Calculator</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('notepad')">
+                        <div class="app-squircle bg-emerald">📝</div>
+                        <span class="app-label">Notepad</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('snipping')">
+                        <div class="app-squircle bg-pink">✂️</div>
+                        <span class="app-label">Snipping</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('chrome')">
+                        <div class="app-squircle bg-purple">🌐</div>
+                        <span class="app-label">Browser</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('explorer')">
+                        <div class="app-squircle bg-amber">📁</div>
+                        <span class="app-label">Explorer</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('screenshot')">
+                        <div class="app-squircle bg-cyan">📸</div>
+                        <span class="app-label">Screenshot</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('osk')">
+                        <div class="app-squircle bg-dark">⌨️</div>
+                        <span class="app-label">On-Screen Key</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('lock')">
+                        <div class="app-squircle bg-purple">🔒</div>
+                        <span class="app-label">Lock PC</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('sleep')">
+                        <div class="app-squircle bg-pink">💤</div>
+                        <span class="app-label">Sleep PC</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Speeds & Diagnostics Card -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">📡 Network &amp; Hardware Telemetry</div>
+                    <div class="card-badge" id="wifi-name">Loading...</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0;">
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-dim);">UPLOAD SPEED</div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--accent-cyan);" id="net-up-text">0.0 MB/s</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: var(--text-dim);">DOWNLOAD SPEED</div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--accent-purple);" id="net-down-text">0.0 MB/s</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <div class="glass-pill" style="display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span id="battery-icon">🔋</span>
+                        <span id="battery-pct">--%</span>
+                    </div>
+                    <div class="glass-pill" style="display:flex; align-items:center; justify-content:center; gap:6px;">
+                        <span>📶</span>
+                        <span id="wifi-speed">-- Mbps</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= PANEL 2: CONTROL CENTER ================= -->
+        <div id="control-panel" class="panel">
+            <!-- Full Media Remote -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title">🎮 Full Media &amp; Key Remote</div>
+                </div>
+                <div class="media-bar" style="margin-top: 0; padding: 14px;">
+                    <button class="media-btn" onclick="cmd('prev')">⏮️</button>
+                    <button class="media-btn play-main" onclick="cmd('playpause')">⏯️</button>
+                    <button class="media-btn" onclick="cmd('next')">⏭️</button>
+                </div>
+                <div class="pills-row" style="margin-top: 12px;">
+                    <div class="glass-pill" onclick="cmd('volup')">🔊 Vol +</div>
+                    <div class="glass-pill" onclick="cmd('voldown')">🔉 Vol -</div>
+                    <div class="glass-pill" onclick="cmd('mute')">🔇 Mute</div>
+                </div>
+            </div>
+
+            <!-- Presentation & Navigation Keys -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title purple">🧭 Windows Navigation &amp; Hotkeys</div>
+                </div>
+                <div class="tools-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=win')">
+                        <span class="tool-icon">🪟</span>
+                        <span class="tool-name">Start (Win)</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=showdesktop')">
+                        <span class="tool-icon">🖥️</span>
+                        <span class="tool-name">Show Desktop</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=alttab')">
+                        <span class="tool-icon">🔀</span>
+                        <span class="tool-name">Alt + Tab</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=esc')">
+                        <span class="tool-icon">⎋</span>
+                        <span class="tool-name">Escape</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=enter')">
+                        <span class="tool-icon">⏎</span>
+                        <span class="tool-name">Enter</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('remote/keyboard/press?val=tab')">
+                        <span class="tool-icon">⇥</span>
+                        <span class="tool-name">Tab</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power Management -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title ruby">⚡ PC Power Management</div>
+                </div>
+                <div class="tools-grid">
+                    <div class="tool-tile" onclick="confirmCmd('shutdown', 'Shutdown')">
+                        <span class="tool-icon" style="color: var(--accent-ruby);">⏻</span>
+                        <span class="tool-name" style="color: var(--accent-ruby);">Shutdown</span>
+                    </div>
+                    <div class="tool-tile" onclick="confirmCmd('restart', 'Restart')">
+                        <span class="tool-icon" style="color: var(--accent-emerald);">🔄</span>
+                        <span class="tool-name">Restart</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('sleep')">
+                        <span class="tool-icon" style="color: var(--accent-purple);">💤</span>
+                        <span class="tool-name">Sleep</span>
+                    </div>
+                    <div class="tool-tile" onclick="cmd('abort')">
+                        <span class="tool-icon" style="color: var(--accent-amber);">🚫</span>
+                        <span class="tool-name">Abort Timer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL 3: TOUCHPAD ================= -->
+        <div id="touchpad-panel" class="panel">
+            <div class="glass-card" style="padding: 12px;">
+                <div class="touchpad-box" id="touchpad">
+                    <div class="touchpad-instructions">
+                        <span class="icon">🖱️</span>
+                        <strong>VIRTUAL GLASS TRACKPAD</strong><br>
+                        1 Finger: Move pointer • Tap: Left Click<br>
+                        2 Fingers: Smooth Scroll • 3 Fingers: Right Click
+                    </div>
+                </div>
+                <div class="mouse-pedals">
+                    <div class="pedal-btn" onclick="sendMouseClick('left')">🖱️ LEFT CLICK</div>
+                    <div class="pedal-btn" onclick="sendMouseClick('right')">🖱️ RIGHT CLICK</div>
+                </div>
+                <div class="pills-row">
+                    <div class="glass-pill" onclick="cmd('remote/keyboard/press?val=enter')">⏎ Enter</div>
+                    <div class="glass-pill" onclick="cmd('remote/keyboard/press?val=backspace')">⌫ Backspace</div>
+                    <div class="glass-pill" onclick="cmd('remote/keyboard/press?val=space')">␣ Space</div>
+                    <div class="glass-pill" onclick="cmd('remote/keyboard/press?val=esc')">⎋ Esc</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL 4: SCREEN MIRROR ================= -->
+        <div id="mirror-panel" class="panel">
+            <div class="mirror-container">
+                <canvas id="mirror-canvas"></canvas>
+                <div class="mirror-toolbar">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="glass-pill" id="btn-toggle-mirror" onclick="toggleMirrorStream()">▶️ Stream</button>
+                        <span class="card-badge" id="mirror-fps">0 FPS</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="glass-pill" onclick="takeScreenshot()">📸 Snap</button>
+                        <button class="glass-pill" onclick="toggleFullscreen(true)">⛶ Fullscreen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL 5: APPS ================= -->
+        <div id="apps-panel" class="panel">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title purple">🚀 Quick App Springboard</div>
+                </div>
+                <div class="springboard-grid">
+                    <div class="app-icon-card" onclick="cmd('taskmgr')">
+                        <div class="app-squircle bg-cyan">📊</div>
+                        <span class="app-label">Task Manager</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('cmd')">
+                        <div class="app-squircle bg-dark">💻</div>
+                        <span class="app-label">Command Line</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('powershell')">
+                        <div class="app-squircle bg-blue">⚡</div>
+                        <span class="app-label">PowerShell</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('calc')">
+                        <div class="app-squircle bg-amber">🧮</div>
+                        <span class="app-label">Calculator</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('notepad')">
+                        <div class="app-squircle bg-emerald">📝</div>
+                        <span class="app-label">Notepad</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('snipping')">
+                        <div class="app-squircle bg-pink">✂️</div>
+                        <span class="app-label">Snipping</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('chrome')">
+                        <div class="app-squircle bg-purple">🌐</div>
+                        <span class="app-label">Chrome / Edge</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('explorer')">
+                        <div class="app-squircle bg-amber">📁</div>
+                        <span class="app-label">File Explorer</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('settings')">
+                        <div class="app-squircle bg-dark">⚙️</div>
+                        <span class="app-label">Settings</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('osk')">
+                        <div class="app-squircle bg-blue">⌨️</div>
+                        <span class="app-label">On-Screen Key</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('lock')">
+                        <div class="app-squircle bg-purple">🔒</div>
+                        <span class="app-label">Lock PC</span>
+                    </div>
+                    <div class="app-icon-card" onclick="cmd('sleep')">
+                        <div class="app-squircle bg-pink">💤</div>
+                        <span class="app-label">Sleep PC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL 6: TOOLS & PROCESSES ================= -->
+        <div id="tools-panel" class="panel">
+            <!-- Clipboard Sync & Direct PC Typer -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title cyan">📋 Live Clipboard &amp; Direct Typer</div>
+                </div>
+                <textarea id="clipboard-text" placeholder="Type text to send to PC clipboard or direct key input..." style="width: 100%; height: 75px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; color: #fff; padding: 10px; font-family: inherit; font-size: 12px; resize: none; margin-bottom: 10px;"></textarea>
+                <div class="pills-row">
+                    <div class="glass-pill" onclick="pushClipboard()">📤 Push to PC</div>
+                    <div class="glass-pill" onclick="pullClipboard()">📥 Pull from PC</div>
+                    <div class="glass-pill" onclick="typeDirectText()" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #000;">⌨️ Type into PC</div>
+                </div>
+            </div>
+
+            <!-- Live Process Killer -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title ruby">🛑 Process Manager &amp; Task Killer</div>
+                    <button class="card-badge" onclick="loadProcesses()" style="cursor:pointer;">🔄 Refresh</button>
+                </div>
+                <input type="text" class="proc-search-input" id="proc-search" placeholder="Search processes..." oninput="filterProcesses(this.value)">
+                <div id="processes-list" style="max-height: 280px; overflow-y: auto;">
+                    <div style="text-align:center; padding: 20px; color: var(--text-dim); font-size: 12px;">Tap Refresh to load active processes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PANEL 7: FILES ================= -->
+        <div id="files-panel" class="panel">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-title amber">📁 Shared PC Files</div>
+                    <button class="card-badge" onclick="loadFiles()" style="cursor:pointer;">🔄 Refresh</button>
+                </div>
+                <div id="file-list" style="max-height: 360px; overflow-y: auto;">
+                    <div style="text-align:center; padding: 30px; color: var(--text-dim); font-size: 12px;">Loading shared files...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating VisionOS Glass Pill Dock (Bottom) -->
+    <div class="glass-dock">
+        <a class="dock-item active" data-panel="dashboard" onclick="showPanel('dashboard')">
+            <span class="dock-icon">⚡</span>
+            <span class="dock-label">Home</span>
+        </a>
+        <a class="dock-item" data-panel="control" onclick="showPanel('control')">
+            <span class="dock-icon">🎛️</span>
+            <span class="dock-label">Control</span>
+        </a>
+        <a class="dock-item" data-panel="touchpad" onclick="showPanel('touchpad')">
+            <span class="dock-icon">🖱️</span>
+            <span class="dock-label">Trackpad</span>
+        </a>
+        <a class="dock-item" data-panel="mirror" onclick="showPanel('mirror')">
+            <span class="dock-icon">📺</span>
+            <span class="dock-label">Mirror</span>
+        </a>
+        <a class="dock-item" data-panel="apps" onclick="showPanel('apps')">
+            <span class="dock-icon">🚀</span>
+            <span class="dock-label">Apps</span>
+        </a>
+        <a class="dock-item" data-panel="tools" onclick="showPanel('tools')">
+            <span class="dock-icon">🛠️</span>
+            <span class="dock-label">Tools</span>
+        </a>
+        <a class="dock-item" data-panel="files" onclick="showPanel('files')">
+            <span class="dock-icon">📁</span>
+            <span class="dock-label">Files</span>
+        </a>
+    </div>
+
+    <!-- Toast Component -->
+    <div id="toast" class="toast">Action completed</div>
+
+    <script>
+        // State & Auth
+        let authToken = localStorage.getItem('pcMasterToken') || '';
+        let pcIp = window.location.hostname || '127.0.0.1';
+        let pcPort = window.location.port || '8099';
+        let isCaffeineActive = false;
+        let allProcesses = [];
+        let countdownTimerInterval = null;
+        let shutdownSecondsLeft = 0;
+
+        // Mirror Variables
+        let mirrorActive = false;
+        let mirrorCanvas = null;
+        let mirrorCtx = null;
+        let mirrorQuality = 75;
+        let frameCount = 0;
+        let lastFpsUpdate = Date.now();
+        let fpsInterval = null;
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initSettings();
+            setInterval(updateStats, 2000);
+            setInterval(() => { loadBattery(); loadWifi(); }, 5000);
+            updateStats();
+            loadBattery();
+            loadWifi();
+            loadBrightness();
+            setupTouchpad();
+        });
+
+        // Settings & Auth Token Fetch
+        function initSettings() {
+            fetch('/settings').then(r => r.json()).then(data => {
+                if (data.authToken) {
+                    authToken = data.authToken;
+                    localStorage.setItem('pcMasterToken', authToken);
+                }
+                if (data.ip) pcIp = data.ip;
+                if (data.port) pcPort = data.port;
+                if (data.hostname) {
+                    document.getElementById('island-title').innerText = data.hostname.toUpperCase();
+                }
+                updateIpDisplay();
+                setConnected(true);
+            }).catch(() => {
+                fetch('/ping').then(r => { if (r.ok) setConnected(true); }).catch(() => setConnected(false));
+                updateIpDisplay();
+            });
+        }
+
+        function updateIpDisplay() {
+            const el = document.getElementById('ip-address-display');
+            if (el) el.innerText = `${pcIp}:${pcPort}`;
+        }
+
+        function copyIpAddress() {
+            const addr = `${pcIp}:${pcPort}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(addr).then(() => {
+                    showToast('IP:Port Copied: ' + addr, 'success');
+                    const b = document.getElementById('ip-copy-badge');
+                    if (b) { b.innerText = 'COPIED!'; setTimeout(() => b.innerText = 'COPY', 1800); }
+                }).catch(() => fallbackCopy(addr));
+            } else {
+                fallbackCopy(addr);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('IP:Port Copied: ' + text, 'success');
+        }
+
+        function setConnected(connected) {
+            const dot = document.getElementById('conn-dot');
+            const status = document.getElementById('conn-status');
+            if (connected) {
+                dot.classList.add('connected');
+                status.textContent = 'PC MASTER ONLINE';
+            } else {
+                dot.classList.remove('connected');
+                status.textContent = 'CONNECTING...';
+            }
+        }
+
+        // Authenticated Fetch Helper
+        function authFetch(url, options = {}) {
+            options.headers = options.headers || {};
+            if (authToken) options.headers['Authorization'] = 'Bearer ' + authToken;
+            const t0 = performance.now();
+            return fetch(url, options).then(r => {
+                const dt = Math.round(performance.now() - t0);
+                const lat = document.getElementById('latency-val');
+                if (lat && dt > 0) lat.innerText = `⚡ ${dt}ms`;
+                if (r.status === 401) {
+                    return fetch('/settings').then(r2 => r2.json()).then(data => {
+                        authToken = data.authToken;
+                        localStorage.setItem('pcMasterToken', authToken);
+                        options.headers['Authorization'] = 'Bearer ' + authToken;
+                        return fetch(url, options);
+                    });
+                }
+                return r;
+            });
+        }
+
+        // Switch Panel
+        function showPanel(p) {
+            document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.glass-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dock-item').forEach(el => el.classList.remove('active'));
+            
+            const panel = document.getElementById(p + '-panel');
+            if (panel) panel.classList.add('active');
+
+            document.querySelectorAll(`[data-panel="${p}"]`).forEach(el => el.classList.add('active'));
+
+            if (p === 'files') loadFiles();
+            if (p === 'tools') loadProcesses();
+            if (p === 'mirror' && !mirrorActive) startMirror();
+        }
+
+        // Command Runner
+        function cmd(c) {
+            if (c === 'gaming') {
+                const isAct = document.getElementById('gaming-btn').classList.contains('active');
+                c = isAct ? 'gamingoff' : 'gamingon';
+            }
+            authFetch('/remote/' + c)
+                .then(r => {
+                    if (r.ok) showToast('Command executed', 'success');
+                    else showToast('Failed', 'error');
+                })
+                .catch(() => showToast('Connection error', 'error'));
+        }
+
+        function confirmCmd(c, name) {
+            if (confirm(`Are you sure you want to ${name} the PC?`)) {
+                cmd(c);
+            }
+        }
+
+        function showToast(m, type) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.innerText = m;
+            t.className = 'toast show' + (type ? ' ' + type : '');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        // Stats Poller
+        function updateStats() {
+            authFetch('/stats').then(r => r.json()).then(data => {
+                setConnected(true);
+
+                // CPU
+                const cpuLoad = Math.round(data.cpuLoad || 0);
+                document.getElementById('cpu-val').innerText = cpuLoad + '%';
+                document.getElementById('cpu-circle').style.strokeDashoffset = 100 - cpuLoad;
+                document.getElementById('cpu-temp').innerText = (Math.round(data.cpuTemp) || '--') + '°C';
+
+                // GPU
+                const gpuLoad = Math.round(data.gpuLoad || 0);
+                document.getElementById('gpu-val').innerText = gpuLoad + '%';
+                document.getElementById('gpu-circle').style.strokeDashoffset = 100 - gpuLoad;
+                document.getElementById('gpu-temp').innerText = (Math.round(data.gpuTemp) || '--') + '°C';
+
+                // RAM
+                const rUsed = Number(data.ramUsed || 0).toFixed(1);
+                const rTotal = Number(data.ramTotal || 1).toFixed(1);
+                const rPct = Math.round((rUsed / rTotal) * 100);
+                document.getElementById('ram-pct').innerText = rPct + '%';
+                document.getElementById('ram-circle').style.strokeDashoffset = 100 - rPct;
+                document.getElementById('ram-text').innerText = `${rUsed} / ${rTotal} GB`;
+
+                // Storage
+                const sUsed = Number(data.storageUsed || 0).toFixed(0);
+                const sTotal = Number(data.storageTotal || 1).toFixed(0);
+                const sPct = Math.round((sUsed / sTotal) * 100);
+                document.getElementById('storage-pct').innerText = sPct + '%';
+                document.getElementById('storage-circle').style.strokeDashoffset = 100 - sPct;
+                document.getElementById('storage-text').innerText = `${sUsed} / ${sTotal} GB`;
+
+                // Network
+                document.getElementById('net-up-text').innerText = (data.netUp || 0) + ' MB/s';
+                document.getElementById('net-down-text').innerText = (data.netDown || 0) + ' MB/s';
+
+                // Gaming Mode
+                const gBtn = document.getElementById('gaming-btn');
+                const gBadge = document.getElementById('gaming-badge');
+                if (data.gamingActive) {
+                    gBtn.classList.add('active');
+                    gBadge.innerText = 'ACTIVE';
+                } else {
+                    gBtn.classList.remove('active');
+                    gBadge.innerText = 'OFF';
+                }
+            }).catch(() => {
+                setConnected(false);
+            });
+        }
+
+        // Volume Controls
+        function onVolumeInput(val) {
+            document.getElementById('vol-fill').style.width = val + '%';
+            document.getElementById('vol-text').innerText = val + '%';
+            document.getElementById('vol-display-badge').innerText = val + '% Vol';
+        }
+        function onVolumeChange(val) {
+            authFetch('/remote/volume/' + val)
+                .then(r => { if (r.ok) showToast('Volume: ' + val + '%', 'success'); });
+        }
+        function setVolumeLevel(val) {
+            document.getElementById('vol-slider').value = val;
+            onVolumeInput(val);
+            onVolumeChange(val);
+        }
+
+        // Brightness Controls
+        function onBrightnessInput(val) {
+            document.getElementById('bright-fill').style.width = val + '%';
+            document.getElementById('brightness-label').innerText = val + '%';
+        }
+        function onBrightnessChange(val) {
+            authFetch('/brightness?level=' + val)
+                .then(r => { if (r.ok) showToast('Brightness: ' + val + '%', 'success'); });
+        }
+        function setBrightness(val) {
+            document.getElementById('brightness-slider').value = val;
+            onBrightnessInput(val);
+            onBrightnessChange(val);
+        }
+
+        // Shutdown Timer Controls
+        function scheduleTimer(action, minutes) {
+            authFetch('/timer?action=' + action + '&minutes=' + minutes)
+                .then(r => {
+                    if (r.ok) {
+                        showToast(`${action.toUpperCase()} scheduled in ${minutes}m`, 'success');
+                        startCountdownUI(minutes * 60);
+                    } else showToast('Timer failed', 'error');
+                });
+        }
+        function cancelTimer() {
+            cmd('abort');
+            clearInterval(countdownTimerInterval);
+            document.getElementById('countdown-clock').innerText = '00:00:00';
+            document.getElementById('countdown-status').innerText = 'TIMER CANCELLED';
+            document.getElementById('timer-badge').innerText = 'INACTIVE';
+            showToast('Shutdown timer cancelled', 'success');
+        }
+        function startCountdownUI(seconds) {
+            clearInterval(countdownTimerInterval);
+            shutdownSecondsLeft = seconds;
+            document.getElementById('timer-badge').innerText = 'RUNNING';
+            updateCountdownString();
+            countdownTimerInterval = setInterval(() => {
+                shutdownSecondsLeft--;
+                if (shutdownSecondsLeft <= 0) {
+                    clearInterval(countdownTimerInterval);
+                    document.getElementById('countdown-clock').innerText = '00:00:00';
+                    document.getElementById('countdown-status').innerText = 'SHUTTING DOWN...';
+                } else {
+                    updateCountdownString();
+                }
+            }, 1000);
+        }
+        function updateCountdownString() {
+            const h = String(Math.floor(shutdownSecondsLeft / 3600)).padStart(2, '0');
+            const m = String(Math.floor((shutdownSecondsLeft % 3600) / 60)).padStart(2, '0');
+            const s = String(shutdownSecondsLeft % 60).padStart(2, '0');
+            document.getElementById('countdown-clock').innerText = `${h}:${m}:${s}`;
+            document.getElementById('countdown-status').innerText = 'TIME REMAINING';
+        }
+
+        // Caffeine Mode Toggle
+        function toggleCaffeine() {
+            isCaffeineActive = !isCaffeineActive;
+            const c = isCaffeineActive ? 'caffeineon' : 'caffeineoff';
+            cmd(c);
+            document.getElementById('caffeine-name').innerText = isCaffeineActive ? 'Caffeine ON' : 'Caffeine';
+            document.getElementById('caffeine-icon').innerText = isCaffeineActive ? '⚡' : '☕';
+        }
+
+        // Clipboard & Direct Typer
+        function pushClipboard() {
+            const text = document.getElementById('clipboard-text').value;
+            if (!text) { showToast('Please enter text', 'error'); return; }
+            authFetch('/clipboard/set', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            }).then(r => {
+                if (r.ok) showToast('Pushed to PC clipboard!', 'success');
+            });
+        }
+        function pullClipboard() {
+            authFetch('/clipboard/get').then(r => r.json()).then(data => {
+                if (data && data.text) {
+                    document.getElementById('clipboard-text').value = data.text;
+                    showToast('Pulled from PC clipboard', 'success');
+                } else showToast('PC clipboard is empty', 'error');
+            });
+        }
+        function typeDirectText() {
+            const text = document.getElementById('clipboard-text').value;
+            if (!text) { showToast('Please enter text', 'error'); return; }
+            authFetch('/type?text=' + encodeURIComponent(text))
+                .then(r => {
+                    if (r.ok) {
+                        showToast('Typed directly into PC!', 'success');
+                    }
+                });
+        }
+
+        // Process Manager
+        function loadProcesses() {
+            const list = document.getElementById('processes-list');
+            list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);">Loading active processes...</div>';
+            authFetch('/processes').then(r => r.json()).then(procs => {
+                allProcesses = procs || [];
+                renderProcesses(allProcesses);
+            }).catch(() => {
+                list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--accent-ruby);">Failed to load processes</div>';
+            });
+        }
+        function renderProcesses(procs) {
+            const list = document.getElementById('processes-list');
+            if (!procs || procs.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);">No processes found</div>';
+                return;
+            }
+            list.innerHTML = procs.map(p => `
+                <div class="process-item">
+                    <div class="proc-info">
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        <div class="meta">PID: ${p.pid} • RAM: ${p.memory || p.mem_mb || '--'} MB</div>
+                    </div>
+                    <button class="kill-btn" onclick="killProcess(${p.pid}, '${escapeHtml(p.name)}')">KILL</button>
+                </div>
+            `).join('');
+        }
+        function filterProcesses(query) {
+            if (!query) { renderProcesses(allProcesses); return; }
+            const q = query.toLowerCase();
+            const filtered = allProcesses.filter(p => p.name.toLowerCase().includes(q) || String(p.pid).includes(q));
+            renderProcesses(filtered);
+        }
+        function killProcess(pid, name) {
+            if (!confirm(`Kill process ${name} (PID ${pid})?`)) return;
+            authFetch('/kill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pid: pid })
+            }).then(r => {
+                if (r.ok) {
+                    showToast(`Killed ${name}`, 'success');
+                    setTimeout(loadProcesses, 600);
+                } else showToast('Failed to kill process', 'error');
+            });
+        }
+
+        // Shared Files
+        function loadFiles() {
+            const list = document.getElementById('file-list');
+            authFetch('/list?path=' + encodeURIComponent('Shared'))
+                .then(r => r.json())
+                .then(items => {
+                    if (!items || items.length === 0) {
+                        list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);">No files in PC Shared folder</div>';
+                        return;
+                    }
+                    list.innerHTML = items.map(f => `
+                        <div class="process-item">
+                            <div class="proc-info">
+                                <div class="name">📄 ${escapeHtml(f.name)}</div>
+                                <div class="meta">${f.size || ''}</div>
+                            </div>
+                            <a class="glass-pill" href="/download/${encodeURIComponent(f.name)}${authToken ? '?token=' + encodeURIComponent(authToken) : ''}" target="_blank" style="text-decoration:none; padding: 5px 12px;">Download</a>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        // Battery & WiFi
+        function loadBattery() {
+            authFetch('/battery').then(r => r.json()).then(b => {
+                if (b.available) {
+                    document.getElementById('battery-pct').textContent = b.charge + '%';
+                    document.getElementById('battery-icon').textContent = b.charging ? '⚡' : '🔋';
+                }
+            }).catch(() => {});
+        }
+        function loadWifi() {
+            authFetch('/wifi').then(r => r.json()).then(w => {
+                if (w.connected) {
+                    document.getElementById('wifi-speed').textContent = w.speed + ' Mbps';
+                    document.getElementById('wifi-name').textContent = w.name || w.ssid || 'WiFi Online';
+                }
+            }).catch(() => {});
+        }
+        function loadBrightness() {
+            authFetch('/brightness').then(r => r.json()).then(b => {
+                if (b.level >= 0) {
+                    document.getElementById('brightness-slider').value = b.level;
+                    onBrightnessInput(b.level);
+                }
+            }).catch(() => {});
+        }
+
+        // Touchpad Implementation
+        function setupTouchpad() {
+            const pad = document.getElementById('touchpad');
+            if (!pad) return;
+            let lastX = 0, lastY = 0;
+            let startX = 0, startY = 0;
+            let isTwoFinger = false;
+            let isThreeFinger = false;
+            let touchStartTime = 0;
+
+            pad.addEventListener('touchstart', e => {
+                e.preventDefault();
+                touchStartTime = Date.now();
+                if (e.touches.length === 2) {
+                    isTwoFinger = true;
+                    lastY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                } else if (e.touches.length === 3) {
+                    isThreeFinger = true;
+                } else if (e.touches.length === 1) {
+                    isTwoFinger = false;
+                    isThreeFinger = false;
+                    lastX = e.touches[0].clientX;
+                    lastY = e.touches[0].clientY;
+                    startX = lastX;
+                    startY = lastY;
+                }
+                pad.classList.add('active');
+            }, { passive: false });
+
+            pad.addEventListener('touchmove', e => {
+                e.preventDefault();
+                if (isTwoFinger && e.touches.length === 2) {
+                    const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    const dy = currentY - lastY;
+                    if (Math.abs(dy) > 4) {
+                        authFetch('/remote/mouse/scroll?val=' + Math.round(dy * 2)).catch(() => {});
+                        lastY = currentY;
+                    }
+                } else if (!isTwoFinger && !isThreeFinger && e.touches.length === 1) {
+                    const dx = Math.round((e.touches[0].clientX - lastX) * 1.8);
+                    const dy = Math.round((e.touches[0].clientY - lastY) * 1.8);
+                    if (dx !== 0 || dy !== 0) {
+                        authFetch(`/remote/mouse/move?x=${dx}&y=${dy}`).catch(() => {});
+                        lastX = e.touches[0].clientX;
+                        lastY = e.touches[0].clientY;
+                    }
+                }
+            }, { passive: false });
+
+            pad.addEventListener('touchend', e => {
+                e.preventDefault();
+                pad.classList.remove('active');
+                const elapsed = Date.now() - touchStartTime;
+                if (isThreeFinger) {
+                    sendMouseClick('right');
+                    isThreeFinger = false;
+                    return;
+                }
+                if (!isTwoFinger && e.touches.length === 0) {
+                    const dx = Math.abs(lastX - startX);
+                    const dy = Math.abs(lastY - startY);
+                    if (dx < 10 && dy < 10 && elapsed < 300) {
+                        sendMouseClick('left');
+                    }
+                }
+            }, { passive: false });
+        }
+
+        function sendMouseClick(btn) {
+            authFetch(`/remote/mouse/${btn}click`)
+                .then(() => {
+                    if (navigator.vibrate) navigator.vibrate(25);
+                });
+        }
+
+        // Screen Mirroring
+        function toggleMirrorStream() {
+            if (mirrorActive) stopMirror();
+            else startMirror();
+        }
+        function startMirror() {
+            mirrorActive = true;
+            mirrorCanvas = document.getElementById('mirror-canvas');
+            if (mirrorCanvas) mirrorCtx = mirrorCanvas.getContext('2d');
+            const btn = document.getElementById('btn-toggle-mirror');
+            if (btn) btn.innerText = '⏹️ Stop';
+            showToast('Screen stream starting...', 'success');
+            authFetch('/mirror/start').catch(() => {});
+            streamLoop();
+        }
+        function stopMirror() {
+            mirrorActive = false;
+            const btn = document.getElementById('btn-toggle-mirror');
+            if (btn) btn.innerText = '▶️ Stream';
+            authFetch('/mirror/stop').catch(() => {});
+            showToast('Screen stream stopped');
+        }
+        async function streamLoop() {
+            while (mirrorActive) {
+                try {
+                    const res = await authFetch(`/mirror/live?q=${mirrorQuality}&w=1280&t=${Date.now()}`);
+                    if (!res.ok) throw new Error('Stream error');
+                    const blob = await res.blob();
+                    const img = new Image();
+                    await new Promise((resolve, reject) => {
+                        img.onload = () => {
+                            if (mirrorCanvas) {
+                                if (mirrorCanvas.width !== img.width || mirrorCanvas.height !== img.height) {
+                                    mirrorCanvas.width = img.width;
+                                    mirrorCanvas.height = img.height;
+                                }
+                                mirrorCtx.drawImage(img, 0, 0);
+                            }
+                            frameCount++;
+                            const now = Date.now();
+                            if (now - lastFpsUpdate >= 1000) {
+                                const fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+                                const fEl = document.getElementById('mirror-fps');
+                                if (fEl) fEl.innerText = `${fps} FPS`;
+                                frameCount = 0;
+                                lastFpsUpdate = now;
+                            }
+                            URL.revokeObjectURL(img.src);
+                            resolve();
+                        };
+                        img.onerror = reject;
+                        img.src = URL.createObjectURL(blob);
+                    });
+                } catch (e) {
+                    await new Promise(r => setTimeout(r, 200));
+                }
+            }
+        }
+
+        function toggleFullscreen(enable) {
+            if (enable) document.body.classList.add('mirror-fullscreen');
+            else document.body.classList.remove('mirror-fullscreen');
+        }
+
+        function takeScreenshot() {
+            authFetch('/screenshot').then(r => {
+                if (!r.ok) throw new Error('Failed');
+                return r.blob();
+            }).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `PC_Screenshot_${Date.now()}.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Screenshot downloaded!', 'success');
+            }).catch(() => showToast('Failed to take screenshot', 'error'));
+        }
+
+        function escapeHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+    </script>
+</body>
+</html>

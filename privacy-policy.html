@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - PCLink & PC Master</title>
+    <meta name="description" content="Privacy Policy for PCLink & PC Master Universal Controller Android application. 100% Local Peer-to-Peer, Zero Cloud Dependency, Zero Tracking.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-card: rgba(18, 24, 38, 0.85);
+            --bg-card-hover: rgba(26, 35, 54, 0.95);
+            --border-color: rgba(64, 120, 224, 0.22);
+            --border-glow: rgba(0, 210, 255, 0.4);
+            --text-main: #f0f4fc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #00d2ff;
+            --accent-blue: #3a86ff;
+            --accent-purple: #8338ec;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(58, 134, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(131, 56, 236, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.05) 0%, transparent 60%);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.7;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 25px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple));
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+            background: rgba(0, 210, 255, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto 20px;
+        }
+
+        .meta-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .meta-bar strong {
+            color: var(--text-secondary);
+        }
+
+        /* Table of Contents */
+        .toc-card {
+            background: rgba(18, 24, 38, 0.65);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(12px);
+        }
+
+        .toc-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
+            list-style: none;
+        }
+
+        .toc-grid a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .toc-grid a:hover {
+            color: var(--text-main);
+            background: rgba(58, 134, 255, 0.15);
+            transform: translateX(4px);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 36px 32px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            position: relative;
+        }
+
+        .section-card:hover {
+            border-color: rgba(64, 120, 224, 0.45);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .section-icon {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(58, 134, 255, 0.15);
+            border: 1px solid rgba(58, 134, 255, 0.3);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin: 22px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+        }
+
+        p strong {
+            color: var(--text-main);
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 0.96rem;
+        }
+
+        li strong {
+            color: var(--text-main);
+        }
+
+        /* Callout Box */
+        .callout {
+            background: rgba(0, 210, 255, 0.06);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 0 12px 12px 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .callout-green {
+            background: rgba(16, 185, 129, 0.08);
+            border-left-color: var(--accent-green);
+        }
+
+        .callout p {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        /* Permission Table */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.92rem;
+            background: rgba(14, 20, 32, 0.7);
+        }
+
+        th {
+            background: rgba(24, 34, 52, 0.9);
+            color: var(--accent-cyan);
+            font-weight: 700;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(58, 134, 255, 0.06);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-cyan);
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .tag-status {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.18);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            white-space: nowrap;
+        }
+
+        /* Buttons & Links */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            box-shadow: 0 4px 14px rgba(58, 134, 255, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(58, 134, 255, 0.5);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 35px 20px;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 14px;
+            }
+
+            h1 {
+                font-size: 1.85rem;
+            }
+
+            .section-card {
+                padding: 24px 20px;
+            }
+
+            .meta-bar {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <header>
+        <div class="badge badge-green">
+            <span>🔒</span> 100% Zero Data Collection • Local Peer-to-Peer
+        </div>
+        <h1>Privacy Policy</h1>
+        <p class="subtitle">PCLink &amp; PC Master Remote Cockpit Ecosystem</p>
+        <div class="meta-bar">
+            <span><strong>Application:</strong> PCLink (Android) &amp; PC Master (Windows Server)</span>
+            <span><strong>Effective Date:</strong> September 29, 2026</span>
+            <span><strong>Version:</strong> 2.5.0 Pro</span>
+            <span><strong>Developer:</strong> Beyond Edge</span>
+        </div>
+    </header>
+
+    <!-- Table of Contents -->
+    <nav class="toc-card">
+        <div class="toc-title">
+            <span>📑</span> Table of Contents
+        </div>
+        <ul class="toc-grid">
+            <li><a href="#overview">1. Overview &amp; Privacy Philosophy</a></li>
+            <li><a href="#permissions">2. Device Permissions &amp; Technical Use</a></li>
+            <li><a href="#data-collection">3. Information We Collect (None)</a></li>
+            <li><a href="#remote-control">4. Universal Remote (IR &amp; Wi-Fi)</a></li>
+            <li><a href="#screen-mirroring">5. Screen Mirroring &amp; Media Projection</a></li>
+            <li><a href="#notifications">6. Notification Sync Service</a></li>
+            <li><a href="#security">7. Data Security &amp; Local Network Safety</a></li>
+            <li><a href="#third-parties">8. Third-Party Services &amp; Ads</a></li>
+            <li><a href="#children">9. Children’s Privacy (COPPA/GDPR)</a></li>
+            <li><a href="#retention-deletion">10. Data Retention &amp; User Rights</a></li>
+            <li><a href="#contact">11. Contact &amp; Developer Support</a></li>
+        </ul>
+    </nav>
+
+    <!-- Section 1: Overview -->
+    <section id="overview" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🏛️</div>
+            <h2>1. Overview &amp; Privacy Philosophy</h2>
+        </div>
+        <p>
+            Welcome to <strong>PCLink</strong>, developed by <strong>Beyond Edge</strong> ("we", "our", or "us"). 
+            PCLink is a dual-purpose mobile companion designed for:
+        </p>
+        <ol>
+            <li><strong>PC Master Cockpit:</strong> Seamless, ultra-low latency desktop control, trackpad, keyboard, 4K screen streaming, hardware telemetry, process monitoring, and file transfer with your own personal computer over your local private Wi-Fi network.</li>
+            <li><strong>Universal Appliance Remote:</strong> Direct hardware Infrared (IR) and local Wi-Fi control for Smart TVs, DTH Set-Top Boxes, Air Conditioners, Streaming Sticks (Fire TV / Roku), and Fans — with zero PC dependency.</li>
+        </ol>
+
+        <div class="callout callout-green">
+            <p>
+                <strong>Our Core Privacy Guarantee:</strong> PCLink operates on a strict <strong>100% Peer-to-Peer (P2P) Local Area Network (LAN)</strong> architecture. 
+                We do not operate central cloud databases, remote relay servers, tracking telemetry, or user analytics. 
+                Your files, keystrokes, notifications, screen pixels, and remote commands <strong>NEVER leave your local network</strong> and are never transmitted to us or any third party.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 2: Permissions Table -->
+    <section id="permissions" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🔑</div>
+            <h2>2. Android Permissions &amp; Technical Justification</h2>
+        </div>
+        <p>
+            In compliance with the Google Play Developer Policy and user privacy standards, below is the exhaustive list of Android permissions requested by PCLink, along with the specific technical purpose and data handling behavior:
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Android Permission</th>
+                        <th>Feature / Module</th>
+                        <th>Technical Purpose</th>
+                        <th>Data Handling</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>android.permission.INTERNET</code></td>
+                        <td>Local Socket &amp; Wi-Fi Control</td>
+                        <td>Establishes direct WebSocket and HTTP REST connections to your PC server (e.g. <code>192.168.x.x:8099</code>) and local Smart TVs / Streaming devices (ports 8060, 5555, 8001).</td>
+                        <td><span class="tag-status">100% Local Only</span><br>Never connects to external cloud servers.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.ACCESS_NETWORK_STATE</code><br><code>android.permission.ACCESS_WIFI_STATE</code></td>
+                        <td>Connection &amp; Subnet Discovery</td>
+                        <td>Detects whether the device is connected to Wi-Fi, identifies local subnet IP ranges, and displays network status to the user.</td>
+                        <td><span class="tag-status">No Collection</span><br>Read locally in memory; never transmitted.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.TRANSMIT_IR</code></td>
+                        <td>Universal Remote (IR Blaster)</td>
+                        <td>Directly pulses the phone’s hardware Consumer Infrared transmitter (20 kHz – 60 kHz) to control TVs, Sun Direct DTH boxes, ACs, and Fans.</td>
+                        <td><span class="tag-status">Hardware Output Only</span><br>Sends pulse timings to emitter; zero data read.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.BIND_NOTIFICATION_LISTENER_SERVICE</code></td>
+                        <td>Notification Sync (Optional)</td>
+                        <td>Allows users who explicitly enable this service to mirror incoming notifications (title, app name, text) to their desktop tray while gaming or working.</td>
+                        <td><span class="tag-status">Ephemeral RAM</span><br>Streamed live to PC; never logged, saved, or uploaded.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION</code><br><code>MediaProjection API</code></td>
+                        <td>Phone-to-PC Screen Mirroring</td>
+                        <td>Captures phone display frames in real-time when the user explicitly taps "Start Screen Mirroring", encoding them for local PC playback.</td>
+                        <td><span class="tag-status">Real-Time Ephemeral</span><br>Zero recordings saved to disk; zero external streaming.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.READ_MEDIA_IMAGES</code><br><code>READ_MEDIA_VIDEO</code><br><code>WRITE_EXTERNAL_STORAGE</code></td>
+                        <td>Wireless File Hub</td>
+                        <td>Allows users to explicitly browse and transfer user-chosen files, screenshots, or documents between phone and PC over local Wi-Fi.</td>
+                        <td><span class="tag-status">User-Initiated</span><br>Only files explicitly selected by the user are sent.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.FOREGROUND_SERVICE</code><br><code>POST_NOTIFICATIONS</code></td>
+                        <td>Background Link Persistence</td>
+                        <td>Maintains a lightweight background service with a persistent status notification to prevent Android OS from disconnecting the link when switching apps.</td>
+                        <td><span class="tag-status">System Requirement</span><br>Displays active connection status icon only.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.VIBRATE</code></td>
+                        <td>Haptic Feedback</td>
+                        <td>Provides tactical haptic feedback when pressing virtual remote buttons, directional pads, or trackpad gestures.</td>
+                        <td><span class="tag-status">Hardware Vibration</span><br>No data involved.</td>
+                    </tr>
+                    <tr>
+                        <td><code>android.permission.BLUETOOTH_CONNECT</code><br><code>android.permission.BLUETOOTH_SCAN</code></td>
+                        <td>Bluetooth Device Mode (Optional)</td>
+                        <td>Optional fallback control for paired Bluetooth media remotes and smart accessories.</td>
+                        <td><span class="tag-status">Local Hardware</span><br>No tracking or location profiling.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Section 3: Data Collection -->
+    <section id="data-collection" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🛡️</div>
+            <h2>3. Information We Collect (Zero Data Collection)</h2>
+        </div>
+        <p>We believe your personal devices should remain strictly your own. Under this policy:</p>
+        <ul>
+            <li><strong>No Personal Identifiable Information (PII):</strong> We do not ask for, collect, store, or transmit your name, phone number, email address, physical location, contacts, or accounts.</li>
+            <li><strong>No Account Creation or Sign-in:</strong> You do not need to register an account, sign in with Google, or provide credentials to use any part of PCLink or PC Master.</li>
+            <li><strong>No Usage Telemetry or Analytics:</strong> We do not track which buttons you press, how long you use the app, which appliances you configure, or what games you play on your PC.</li>
+            <li><strong>No Advertising Trackers or Device Fingerprinting:</strong> PCLink contains <strong>zero third-party advertisement SDKs</strong>, zero device fingerprinting algorithms, and zero marketing beacons.</li>
+        </ul>
+    </section>
+
+    <!-- Section 4: Universal Remote -->
+    <section id="remote-control" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">📱</div>
+            <h2>4. Universal Remote (IR Blaster &amp; Local Wi-Fi)</h2>
+        </div>
+        <p>
+            The Universal Remote module allows direct hardware control of household consumer appliances. 
+            Here is how privacy is preserved during remote operation:
+        </p>
+        <ul>
+            <li><strong>Complete PC Decoupling:</strong> The Universal Remote is 100% decoupled from the PC Master server. When controlling a TV, Sun Direct DTH box, AC, or fan, the app sends commands strictly to the appliance. Your PC volume and controls remain completely unaffected.</li>
+            <li><strong>Direct Hardware Infrared:</strong> For IR-equipped devices, signals are modulated locally by the phone's physical IR diode. No internet access or network traffic is generated.</li>
+            <li><strong>Local Subnet Smart Control:</strong> For Smart TVs (LG webOS, Samsung Tizen, Sony Bravia, Mi TV) and streaming sticks (Amazon Fire TV ADB, Roku ECP), commands are sent directly to the appliance's local IP address on your private home router. Nothing is routed outside your local subnet.</li>
+        </ul>
+    </section>
+
+    <!-- Section 5: Screen Mirroring -->
+    <section id="screen-mirroring" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🖥️</div>
+            <h2>5. Screen Mirroring &amp; Media Projection</h2>
+        </div>
+        <p>
+            When utilizing the Screen Mirroring feature (Phone-to-PC or PC-to-Phone):
+        </p>
+        <ul>
+            <li><strong>Explicit User Consent:</strong> Screen capture can only be started when you explicitly grant system permission via Android’s standard <code>MediaProjection</code> consent prompt.</li>
+            <li><strong>In-Memory Processing:</strong> Video frames are encoded in volatile memory (RAM) and streamed point-to-point over your local Wi-Fi connection directly to the paired PC Master desktop window.</li>
+            <li><strong>Zero Local Recording or Archiving:</strong> The app does not save video files, screenshots, or logs to disk during mirroring unless you deliberately press the manual file transfer / screenshot button yourself.</li>
+        </ul>
+    </section>
+
+    <!-- Section 6: Notification Sync -->
+    <section id="notifications" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🔔</div>
+            <h2>6. Notification Sync Service</h2>
+        </div>
+        <p>
+            PCLink includes an optional <code>NotificationListenerService</code> designed to mirror selected mobile alerts (e.g., incoming call caller ID, SMS text preview, app notifications) directly to your PC desktop tray so you don't miss important messages while gaming or working with headphones on.
+        </p>
+        <ul>
+            <li><strong>Completely Optional:</strong> This feature is disabled by default and requires explicit manual activation in Android system settings.</li>
+            <li><strong>Local Transmission Only:</strong> Notification content is converted into an encrypted local WebSocket payload and sent directly to your PC server IP.</li>
+            <li><strong>No Cloud Storage:</strong> Notifications are never uploaded to any remote server or third-party database. Once rendered on your PC screen, they are discarded from memory.</li>
+        </ul>
+    </section>
+
+    <!-- Section 7: Security -->
+    <section id="security" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🔒</div>
+            <h2>7. Data Security &amp; Local Network Safety</h2>
+        </div>
+        <p>
+            We implement multiple layers of security to safeguard your local device interactions:
+        </p>
+        <ul>
+            <li><strong>Optional Security Token:</strong> You can configure a secret authentication passphrase / security token on both the PC Master server and the PCLink Android client. All unauthorized socket connections lacking this token are immediately rejected.</li>
+            <li><strong>Private Network Boundary:</strong> By default, the PC Master server listens only on local private network adapters (e.g., <code>192.168.x.x</code> or <code>10.x.x.x</code>) and does not open UPnP or public WAN ports.</li>
+            <li><strong>Local Preference Storage:</strong> All user settings (such as paired IP addresses, port numbers, favorite remote layouts, and theme preferences) are stored strictly on your local device using Android's private <code>EncryptedSharedPreferences</code>.</li>
+        </ul>
+    </section>
+
+    <!-- Section 8: Third Parties -->
+    <section id="third-parties" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🚫</div>
+            <h2>8. Third-Party Services, SDKs &amp; Advertisements</h2>
+        </div>
+        <p>
+            Unlike many commercial remote apps, PCLink is built with an anti-bloat, privacy-first commitment:
+        </p>
+        <ul>
+            <li><strong>Zero Commercial Ad Networks:</strong> We do not integrate Google AdMob, Unity Ads, AppLovin, Facebook Audience Network, or any other banner/video ad providers.</li>
+            <li><strong>Zero External Analytics SDKs:</strong> We do not include Google Firebase Analytics, AppsFlyer, Adjust, Flurry, or Crashlytics tracking modules.</li>
+            <li><strong>Open Freedom:</strong> You will never be prompted for in-app purchases, microtransactions, or paid subscriptions.</li>
+        </ul>
+    </section>
+
+    <!-- Section 9: Children -->
+    <section id="children" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">👶</div>
+            <h2>9. Children’s Privacy (COPPA &amp; GDPR Compliance)</h2>
+        </div>
+        <p>
+            PCLink is a general-purpose utility tool intended for managing personal computers and household entertainment appliances. 
+            Because <strong>no personal information of any kind is ever collected, requested, or transmitted</strong>, our application is fully compliant with the Children's Online Privacy Protection Act (<strong>COPPA</strong>) and the EU General Data Protection Regulation (<strong>GDPR</strong>). 
+            We do not knowingly solicit or collect data from anyone under the age of 13 (or under 16 in the European Union).
+        </p>
+    </section>
+
+    <!-- Section 10: Retention & Rights -->
+    <section id="retention-deletion" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">🗑️</div>
+            <h2>10. Data Retention, Deletion &amp; Your Rights</h2>
+        </div>
+        <p>
+            Because we do not collect, process, or store your personal data on any servers, we have no personal data to retain, sell, or disclose. 
+        </p>
+        <ul>
+            <li><strong>Immediate Data Removal:</strong> You can completely clear all cached IP addresses, pairing history, and remote preferences at any time by navigating to <em>Android Settings &gt; Apps &gt; PCLink &gt; Storage &gt; Clear Data</em>, or by simply uninstalling the application.</li>
+            <li><strong>User Rights:</strong> Under GDPR, CCPA, and similar worldwide data privacy frameworks, you have the right to access, rectify, or delete your personal data. Because we store zero personal data, your right to privacy is guaranteed by default by the architecture of the application.</li>
+        </ul>
+    </section>
+
+    <!-- Section 11: Contact & Support -->
+    <section id="contact" class="section-card">
+        <div class="section-header">
+            <div class="section-icon">✉️</div>
+            <h2>11. Developer Contact &amp; Community Support</h2>
+        </div>
+        <p>
+            If you have questions, feedback, security vulnerability disclosures, or inquiries regarding this Privacy Policy or the PCLink application, please reach out directly:
+        </p>
+
+        <div style="margin: 20px 0; padding: 20px; background: rgba(255, 255, 255, 0.04); border-radius: 14px; border: 1px solid var(--border-color);">
+            <p style="margin-bottom: 8px;"><strong>Developer / Publisher:</strong> Beyond Edge</p>
+            <p style="margin-bottom: 8px;"><strong>Official Support Email:</strong> <a href="mailto:novamusicpro2025@gmail.com" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">novamusicpro2025@gmail.com</a></p>
+            <p style="margin-bottom: 8px;"><strong>YouTube Channel:</strong> <a href="https://youtube.com/@BeyondEdge1995" target="_blank" rel="noopener noreferrer" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Beyond Edge (@BeyondEdge1995)</a></p>
+            <p style="margin: 0;"><strong>Other Google Play Apps:</strong> NovaMusicPro - Share_shorts, MathRush : Brain Training</p>
+        </div>
+
+        <div class="btn-group">
+            <a href="mailto:novamusicpro2025@gmail.com?subject=PCLink%20Privacy%20Inquiry" class="btn">
+                <span>✉️</span> Contact Developer
+            </a>
+            <a href="https://youtube.com/@BeyondEdge1995" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                <span>📺</span> Watch Tutorials
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 <strong>Beyond Edge</strong> &amp; PC Master Project. All rights reserved.</p>
+        <p style="margin-top: 8px; font-size: 0.8rem;">
+            This policy is hosted publicly for Google Play Store compliance, open transparency, and user privacy protection.
+        </p>
+    </footer>
+
+</div>
+
+</body>
+</html>

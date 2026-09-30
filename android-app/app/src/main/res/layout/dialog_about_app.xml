@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/card_pod_bg"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ℹ️"
+            android:textSize="26sp"
+            android:layout_marginEnd="10dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="About PCLink"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Version 2.5.0 Pro • Dual Control Hub (PC &amp; Appliances)"
+                android:textColor="#8B949E"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#1F293D"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Scrollable Specs -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingEnd="4dp">
+
+            <!-- Card 1: Core Architecture -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏛️ System Architecture"
+                    android:textColor="#00D2FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 100% Peer-to-Peer Local Area Network (LAN): All communication between phone and PC runs directly over local Wi-Fi via WebSocket &amp; HTTP REST.\n• Dual-Mode Hardware Universal Remote Engine: Direct phone Consumer IR Blaster (20–60 kHz pulse modulation) + Local Subnet Smart TV &amp; STB Wi-Fi Socket controller.\n• Zero Cloud Dependency: Operates completely offline without external servers, internet routing, or third-party proxies.\n• Ultra-Low Latency Pipeline: Real-time mouse gesture digitizer and sub-25ms video streaming over 5GHz/2.4GHz Wi-Fi."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Card 2: Technology Stack -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️ Technology Stack"
+                    android:textColor="#00FF88"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Android Mobile Client: 100% Native Kotlin, AndroidX Jetpack, Material 3 Glassmorphism UI, Kotlin Coroutines, OkHttp3 WebSocket, Android ConsumerIrManager Hardware IR API, NotificationListenerService, MediaProjection API, Custom Multi-Touch Digitizer.\n• Windows PC Server: Microsoft .NET 8 / C#, Windows Presentation Foundation (WPF), Native Win32 User32 APIs, Windows Management Instrumentation (WMI) Hardware Telemetry, NAudio / CoreAudio Endpoint API, Screen Capture BitBlt Pipeline, UDP Port 8091 Discovery Beacon."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Card 3: Universal Hardware Remote (IR & Local Wi-Fi) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📱 Universal Remote (IR &amp; Same Wi-Fi)"
+                    android:textColor="#34C759"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 3 Intelligent Transmission Modes:\n  1. 📡 IR Blaster: Direct hardware infrared pulses (20 kHz – 60 kHz) covering 99.9% of home appliances.\n  2. 📶 Same-WiFi LAN: Direct local network smart protocols (Roku ECP, Sony IRCC, Android TV / Fire TV ADB port 5555, Samsung Smart TV WS).\n  3. ⚡ Dual Mode: Fires IR pulses and Wi-Fi commands simultaneously for maximum reliability.\n• Supported Appliance Categories:\n  - Smart TVs: Samsung, LG, Sony, Mi / Xiaomi, OnePlus, TCL, Panasonic, Vu, Realme, Hisense.\n  - DTH &amp; Set-Top Boxes: Sun Direct DTH (HD/SD), Airtel Digital TV, Tata Play, Jio Fiber STB, Dish TV, Videocon d2h.\n  - Streaming Devices: Amazon Fire TV &amp; Fire Stick, Roku, Android TV / Google TV, Apple TV.\n  - Climate &amp; ACs: Daikin, Voltas, LG, Samsung, Blue Star, Lloyd, Carrier, Hitachi.\n  - Smart Fans: Atomberg (Smart + Sleep timer), Crompton, Havells, Orient, Luminous.\n• 100% Standalone &amp; Decoupled: Operates completely independently from PC audio/controls, and accessible directly from the initial Login screen without PC connectivity."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Card 4: PC Master Cockpit & Desktop Control -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🚀 PC Master Cockpit Capabilities"
+                    android:textColor="#FFD600"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• Dual-Way Screen Streaming: PC-to-Phone 4K MAX / 1080p stream with interactive touch screen digitizer, plus Phone-to-PC Screen Mirroring via Android MediaProjection.\n• Real-Time Hardware Telemetry: Live CPU load &amp; thermals, RAM usage sparklines, GPU load &amp; temperature, Battery level &amp; AC adapter status.\n• PC Health &amp; Diagnostics Check: Automated multi-metric health audit (CPU, Memory, Disk, Latency, Thermals) with diagnostic recommendations.\n• Task &amp; Process Manager: View running Windows processes, monitor RAM consumption, and terminate tasks remotely.\n• Cockpit Quick Remote Bar: Windows Start key, Quick Remote Text bar, Copy/Paste clipboard sync, Page Up/Down, Screen Lock/Unlock.\n• Full Glass Trackpad &amp; Extended Virtual Keyboard: F1-F12, Esc, Win, Alt, Ctrl, Tab, Arrow keys.\n• Wireless Local File Hub: High-speed bi-directional phone/PC file download and upload.\n• Notification Sync: Mirror phone notifications, SMS, and incoming calls directly to PC desktop tray.\n• Universal Media Controller: Spotify, YouTube, VLC, Netflix, system volume presets.\n• High-Contrast Black &amp; White Theme Mode."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Card 5: Privacy & Freedom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡️ Privacy, Security &amp; Open Freedom"
+                    android:textColor="#FF4081"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• 100% Zero Data Collection: We do not track, collect, store, or sell any of your data.\n• No Advertising: Zero ads, banners, or marketing trackers.\n• No Accounts Required: No sign-up, no email registration, no subscription fees.\n• Optional Security Token: Protects LAN connection between phone and PC with local token authentication."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+
+                <!-- Action Button: Official Hosted Privacy Policy -->
+                <LinearLayout
+                    android:id="@+id/btnAboutPrivacyPolicy"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/btn_connect_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌐"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Privacy Policy - PCLink &amp; PC Master"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 6: Development & Credits -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👥 Development &amp; Credits"
+                    android:textColor="#B388FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Engineered by the Antigravity PC Master Team &amp; Beyond Edge.\nDedicated to seamless, high-performance personal computing, universal home appliance control, and uncompromising user privacy.\n\nCopyright © 2026 PC Master Project. All rights reserved."
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Card 7: Support Us & Community Apps -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⭐ Support Us &amp; Video Tutorials"
+                    android:textColor="#00FF88"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• YouTube Channel: Beyond Edge (@BeyondEdge1995)\n  Subscribe for complete video tutorials and setup guides.\n\n• Our Apps on Google Play:\n  1. NovaMusicPro - Share_shorts\n  2. MathRush : Brain Training"
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+
+                <!-- Action Button: YouTube -->
+                <LinearLayout
+                    android:id="@+id/btnAboutYoutube"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/btn_scan_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📺 WATCH YOUTUBE TUTORIALS"
+                        android:textColor="#00D2FF"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06" />
+                </LinearLayout>
+
+                <!-- Action Buttons: Play Store Apps -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnAboutNovaMusic"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_scan_bg"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎵 NovaMusicPro"
+                            android:textColor="#00FF88"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnAboutMathRush"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_scan_bg"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🧠 MathRush"
+                            android:textColor="#FFD600"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card 8: Contact & Bug Reports -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_glass_bg"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✉️ Contact Us &amp; Feedback"
+                    android:textColor="#00D2FF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Found a bug, have questions, or want to request new features?\nContact us directly at: novamusicpro2025@gmail.com"
+                    android:textColor="#C9D1D9"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="3dp" />
+
+                <!-- Action Button: Email -->
+                <LinearLayout
+                    android:id="@+id/btnAboutEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/btn_scan_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginTop="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✉️ SEND FEEDBACK EMAIL"
+                        android:textColor="#00D2FF"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Close Button -->
+    <Button
+        android:id="@+id/btnAboutAppClose"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:text="✕ CLOSE"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:background="@drawable/btn_connect_bg"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

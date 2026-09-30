@@ -1,0 +1,763 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/loginScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/bg_cockpit_depth"
+    android:overScrollMode="never">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="40dp">
+
+        <!-- ============================================== -->
+        <!-- 1. AMBIENT GLOW BACKDROPS                      -->
+        <!-- ============================================== -->
+        <View
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:background="@drawable/ambient_glow_cyan"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="-60dp"
+            android:layout_marginStart="-60dp" />
+
+        <View
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:background="@drawable/ambient_glow_purple"
+            app:layout_constraintTop_toBottomOf="@id/cardLoginMain"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="-80dp"
+            android:layout_marginEnd="-80dp" />
+
+        <!-- Quick About App Pill (Top-Left of Login Screen) -->
+        <LinearLayout
+            android:id="@+id/btnLoginAboutApp"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/btn_scan_bg"
+            android:paddingHorizontal="14dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ℹ️ ABOUT"
+                android:textColor="#00D2FF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+        </LinearLayout>
+
+        <!-- Quick Universal Remote Pill (Top-Right of Login Screen) -->
+        <LinearLayout
+            android:id="@+id/btnLoginRemoteQuick"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/btn_scan_bg"
+            android:paddingHorizontal="14dp"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_remote_control"
+                app:tint="#00D2FF"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REMOTE"
+                android:textColor="#00D2FF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- 2. BRANDING LOGO & HEADER                      -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/headerBrandGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Glowing Cyber Emblem -->
+            <FrameLayout
+                android:layout_width="74dp"
+                android:layout_height="74dp"
+                android:background="@drawable/logo_glass_circle_bg">
+
+                <ImageView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_pc_monitor"
+                    app:tint="#00D2FF"
+                    android:contentDescription="PC Master Logo" />
+            </FrameLayout>
+
+            <!-- App Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PCLink"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:layout_marginTop="14dp" />
+
+            <!-- Subtitle -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DESKTOP LINK &amp; CONTROLLER"
+                android:textColor="#00D2FF"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:layout_marginTop="2dp" />
+
+            <!-- Standby Pill -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/status_pill_bg"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/status_dot_bg"
+                    android:backgroundTint="#FF9F0A"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="READY TO CONNECT"
+                    android:textColor="#8A9BB5"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- 3. MAIN LOGIN & CONNECTION CARD               -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/cardLoginMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:layout_marginTop="22dp"
+            app:layout_constraintTop_toBottomOf="@id/headerBrandGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Card Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_wifi_symbol"
+                    app:tint="#00D2FF"
+                    android:contentDescription="WiFi" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Login with IP &amp; Port"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Connect phone directly to your PC Master server"
+                        android:textColor="#6E829F"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Dual Inputs: IP and Port -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- IP Address Input -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="68"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PC ADDRESS OR PAIRING LINK"
+                        android:textColor="#8A9BB5"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="6dp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/edittext_bg"
+                        android:paddingHorizontal="12dp">
+
+                        <ImageView
+                            android:id="@+id/ivLoginEthernetIcon"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_ethernet_symbol"
+                            app:tint="#00D2FF"
+                            android:contentDescription="IP" />
+
+                        <EditText
+                            android:id="@+id/loginIpInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toEndOf="@id/ivLoginEthernetIcon"
+                            android:layout_marginStart="8dp"
+                            android:background="@null"
+                            android:hint="192.168.1.100 or paste pairing info"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#4A5F80"
+                            android:textSize="13.5sp"
+                            android:inputType="textUri"
+                            android:imeOptions="actionNext"
+                            android:singleLine="true" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <!-- Port Input -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="32"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PORT"
+                        android:textColor="#8A9BB5"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="6dp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/edittext_bg"
+                        android:paddingHorizontal="12dp">
+
+                        <ImageView
+                            android:id="@+id/ivLoginNodesIcon"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_nodes_symbol"
+                            app:tint="#BF5AF2"
+                            android:contentDescription="Port" />
+
+                        <EditText
+                            android:id="@+id/loginPortInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toEndOf="@id/ivLoginNodesIcon"
+                            android:layout_marginStart="6dp"
+                            android:background="@null"
+                            android:hint="8099"
+                            android:text="8099"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#4A5F80"
+                            android:textSize="13.5sp"
+                            android:inputType="number"
+                            android:imeOptions="actionDone"
+                            android:singleLine="true" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Optional Security Token Input -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SECURITY TOKEN (OPTIONAL)"
+                    android:textColor="#8A9BB5"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:background="@drawable/edittext_bg"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:id="@+id/ivLoginShieldIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_shield_auth"
+                        app:tint="#00FF88"
+                        android:contentDescription="Shield" />
+
+                    <EditText
+                        android:id="@+id/loginTokenInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_toEndOf="@id/ivLoginShieldIcon"
+                        android:layout_toStartOf="@id/btnLoginToggleToken"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@null"
+                        android:hint="Auto-negotiated (leave empty)"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#4A5F80"
+                        android:textSize="12.5sp"
+                        android:inputType="textPassword"
+                        android:singleLine="true" />
+
+                    <ImageView
+                        android:id="@+id/btnLoginToggleToken"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_eye_toggle"
+                        app:tint="#4A5F80"
+                        android:contentDescription="Toggle Token"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Auto-connect on launch checkbox -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="4dp">
+
+                <CheckBox
+                    android:id="@+id/cbAutoConnect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:buttonTint="#00D2FF" />
+
+                <TextView
+                    android:id="@+id/tvAutoConnectLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remember &amp; auto-connect on app launch"
+                    android:textColor="#8A9BB5"
+                    android:textSize="12sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- LOGIN & CONNECT Primary Button -->
+            <LinearLayout
+                android:id="@+id/btnLoginConnect"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/btn_connect_bg"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginTop="12dp">
+
+                <ImageView
+                    android:id="@+id/ivLoginBtnIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_link_chain"
+                    app:tint="#FFFFFF"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvLoginBtnText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LOGIN &amp; CONNECT"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06" />
+
+                <ProgressBar
+                    android:id="@+id/pbLoginLoading"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="10dp"
+                    android:indeterminateTint="#FFFFFF"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Secondary Actions: AUTO SCAN & RECENT IPS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <!-- Auto Scan Wi-Fi Button -->
+                <LinearLayout
+                    android:id="@+id/btnLoginScan"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/btn_scan_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_scan_search"
+                        app:tint="#00D2FF"
+                        android:layout_marginEnd="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SCAN WI-FI"
+                        android:textColor="#00D2FF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Recent IPs Dropdown Button -->
+                <LinearLayout
+                    android:id="@+id/btnLoginRecent"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/btn_scan_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_more_dots"
+                        app:tint="#BF5AF2"
+                        android:layout_marginEnd="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RECENT IPS"
+                        android:textColor="#BF5AF2"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Live Status Feedback Banner -->
+            <LinearLayout
+                android:id="@+id/loginStatusBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/status_pill_bg"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/loginStatusDot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/status_dot_bg"
+                    android:backgroundTint="#8A9BB5"
+                    android:layout_marginEnd="10dp" />
+
+                <TextView
+                    android:id="@+id/tvLoginStatusMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ready to connect. Make sure PC Master is running on your PC."
+                    android:textColor="#8A9BB5"
+                    android:textSize="11.5sp"
+                    android:lineSpacingExtra="2dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- 3.5 UNIVERSAL REMOTE ACTION CARD (NO PC REQ)   -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/cardLoginUniversalRemote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:layout_constraintTop_toBottomOf="@id/cardLoginMain"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/logo_glass_circle_bg">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_remote_control"
+                        app:tint="#00D2FF" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="12dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="UNIVERSAL REMOTE"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NO PC NEEDED"
+                            android:textColor="#34C759"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/status_pill_bg"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Direct IR Blaster &amp; Wi-Fi Control for TV, Sun Direct, Fire TV, AC &amp; Fans"
+                        android:textColor="#8A9BB5"
+                        android:textSize="11sp"
+                        android:layout_marginTop="3dp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="#00D2FF" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#15FFFFFF"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Direct Launch Button inside Card -->
+            <LinearLayout
+                android:id="@+id/btnOpenUniversalRemoteFromLogin"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/btn_connect_bg"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_remote_control"
+                    app:tint="#050C16"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USE REMOTE DIRECTLY"
+                    android:textColor="#050C16"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- 4. HELP / GUIDE CARD                          -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/cardLoginGuide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/cardLoginUniversalRemote"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💡 How to find your PC IP &amp; Port:"
+                android:textColor="#00D2FF"
+                android:textSize="12.5sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. Open PC Master on your Windows PC.\n2. In the top bar, you will see your IP:Port (e.g., 192.168.1.100:8099).\n3. Make sure your phone and PC are connected to the same Wi-Fi or Mobile Hotspot.\n4. Enter the IP &amp; Port above and tap 'LOGIN &amp; CONNECT'."
+                android:textColor="#6E829F"
+                android:textSize="11.5sp"
+                android:lineSpacingExtra="3dp" />
+        </LinearLayout>
+
+        <!-- Privacy Policy Link on Login Screen -->
+        <LinearLayout
+            android:id="@+id/btnLoginPrivacyPolicy"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:background="@drawable/btn_scan_bg"
+            android:paddingHorizontal="14dp"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/cardLoginGuide"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🛡️"
+                android:textSize="12sp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Privacy Policy - PCLink &amp; PC Master"
+                android:textColor="#00D2FF"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- 5. FOOTER BADGE                                -->
+        <!-- ============================================== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PC Master Cockpit • Secure Local Wi-Fi Connection"
+            android:textColor="#3D4E68"
+            android:textSize="10sp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/btnLoginPrivacyPolicy"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

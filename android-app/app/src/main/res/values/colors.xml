@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Midnight Dark Theme -->
+    <color name="bg_dark">#030509</color>
+    <color name="bg_surface">#05080F</color>
+    <color name="bg_card">#080C14</color>
+    <color name="bg_card_translucent">#E6070B12</color>
+    <color name="bg_input">#090D17</color>
+
+    <!-- Neon Accents -->
+    <color name="neon_cyan">#00D2FF</color>
+    <color name="neon_cyan_glow">#4000D2FF</color>
+    <color name="neon_blue">#0077B6</color>
+    <color name="neon_purple">#BF5AF2</color>
+    <color name="neon_purple_glow">#40BF5AF2</color>
+    <color name="neon_green">#00FF88</color>
+    <color name="neon_green_glow">#4000FF88</color>
+    <color name="neon_emerald">#10B981</color>
+    <color name="neon_amber">#FF9F0A</color>
+    <color name="neon_amber_glow">#40FF9F0A</color>
+    <color name="neon_red">#FF453A</color>
+    <color name="neon_red_glow">#40FF453A</color>
+
+    <!-- Text & Borders -->
+    <color name="text_white">#FFFFFF</color>
+    <color name="text_muted">#8A9BB5</color>
+    <color name="text_dim">#4A5F80</color>
+    <color name="border_glass">#142030</color>
+    <color name="border_cyan_subtle">#3300D2FF</color>
+    <color name="border_purple_subtle">#33BF5AF2</color>
+    <color name="border_green_subtle">#3300FF88</color>
+    <color name="border_amber_subtle">#33FF9F0A</color>
+
+    <!-- Legacy mapped colors for backwards compatibility -->
+    <color name="bg">#030509</color>
+    <color name="card">#080C14</color>
+    <color name="accent_blue">#00D2FF</color>
+    <color name="accent_purple">#BF5AF2</color>
+    <color name="accent_green">#00FF88</color>
+    <color name="accent_red">#FF453A</color>
+    <color name="text">#FFFFFF</color>
+    <color name="border">#142030</color>
+</resources>

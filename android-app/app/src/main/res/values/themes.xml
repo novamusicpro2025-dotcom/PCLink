@@ -1,0 +1,37 @@
+<resources>
+    <style name="Theme.PCMaster" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#00D2FF</item>
+        <item name="colorPrimaryDark">#0077B6</item>
+        <item name="colorAccent">#BF5AF2</item>
+        <item name="android:windowBackground">#030509</item>
+        <item name="android:statusBarColor">#020407</item>
+        <item name="android:navigationBarColor">#020407</item>
+        <item name="bottomNavigationStyle">@style/CustomBottomNavStyle</item>
+        <item name="materialButtonStyle">@style/CustomButtonStyle</item>
+    </style>
+
+    <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@null</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:stateListAnimator">@animator/depth_press</item>
+        <item name="android:elevation">8dp</item>
+    </style>
+
+    <style name="CustomBottomNavStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconSize">22dp</item>
+        <item name="itemTextAppearanceInactive">@style/BottomNavTextInactive</item>
+        <item name="itemTextAppearanceActive">@style/BottomNavTextActive</item>
+    </style>
+
+    <style name="BottomNavTextInactive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">#6A7A96</item>
+        <item name="android:textSize">10.5sp</item>
+    </style>
+
+    <style name="BottomNavTextActive" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">#00D2FF</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

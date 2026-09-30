@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PCLink</string>
+    <string name="url_default">http://192.168.1.100:8099</string>
+    <string name="connect">Connect</string>
+    <string name="settings">Settings</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="url_hint">PC IP Address (e.g. 192.168.1.100:8099)</string>
+    <string name="token_hint">Auth Token (optional)</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+</resources>

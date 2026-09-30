@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular Cyber Cockpit background for D-Pad -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer Glow ring -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#0D00D2FF" />
+            <stroke android:width="2dp" android:color="#2600D2FF" />
+        </shape>
+    </item>
+    <!-- Inner Dark Glass Disc -->
+    <item android:top="6dp" android:bottom="6dp" android:left="6dp" android:right="6dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="270"
+                android:startColor="#E60D1525"
+                android:centerColor="#F0090D17"
+                android:endColor="#FA05070D" />
+            <stroke android:width="1.5dp" android:color="#4000D2FF" />
+        </shape>
+    </item>
+</layer-list>

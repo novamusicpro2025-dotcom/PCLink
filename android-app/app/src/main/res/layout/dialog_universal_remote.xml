@@ -1,0 +1,2231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_cockpit_depth"
+    android:fitsSystemWindows="true"
+    android:paddingHorizontal="14dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
+
+    <!-- Top Remote Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="6dp">
+
+        <!-- LED IR Pulse Indicator Light -->
+        <View
+            android:id="@+id/remoteLedIndicator"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/status_dot_bg"
+            android:backgroundTint="#FF3B30"
+            android:alpha="0.3"
+            android:layout_marginEnd="8dp" />
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_remote_control"
+            app:tint="#00D2FF"
+            android:layout_marginEnd="8dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UNIVERSAL REMOTE"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:id="@+id/tvIrHardwareStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detecting IR &amp; WiFi..."
+                android:textColor="#00FF88"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+
+        <!-- Close Button -->
+        <ImageButton
+            android:id="@+id/btnCloseRemote"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/btn_scan_bg"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#FFFFFF"
+            android:contentDescription="Close Remote" />
+    </LinearLayout>
+
+    <!-- Transmission Mode Selector (Hardware IR vs Local Same-WiFi Smart vs Dual) -->
+    <LinearLayout
+        android:id="@+id/layoutModeSelector"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/btnModeIr"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/remote_mode_selected"
+            android:gravity="center"
+            android:text="📡 IR BLASTER"
+            android:textColor="#00D2FF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/btnModeWifi"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/remote_mode_unselected"
+            android:gravity="center"
+            android:text="📶 SAME WIFI"
+            android:textColor="#8EA4C4"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/btnModeDual"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/remote_mode_unselected"
+            android:gravity="center"
+            android:text="⚡ DUAL (IR+WIFI)"
+            android:textColor="#8EA4C4"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- WiFi Device IP Config Bar (Appears for WiFi / Dual modes) -->
+    <LinearLayout
+        android:id="@+id/layoutWifiDeviceBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/pill_badge_bg"
+        android:backgroundTint="#0E1726"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvWifiNetworkStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📶 Same WiFi: Ready"
+            android:textColor="#00D2FF"
+            android:textSize="10.5sp"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <EditText
+            android:id="@+id/etTargetDeviceIp"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:background="@drawable/btn_scan_bg"
+            android:hint="TV / Stick IP"
+            android:textColorHint="#4A5F7D"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:inputType="textUri"
+            android:paddingHorizontal="6dp"
+            android:layout_marginHorizontal="6dp" />
+
+        <Button
+            android:id="@+id/btnScanWifiDevices"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:background="@drawable/btn_connect_bg"
+            android:text="🔍 SCAN"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="8dp" />
+    </LinearLayout>
+
+    <!-- Category Tabs Selector (Horizontal scrollable for 6 categories) -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tabCatTv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_selected"
+                android:gravity="center"
+                android:text="📺 TV"
+                android:textColor="#00D2FF"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabCatStb"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_unselected"
+                android:gravity="center"
+                android:text="📡 STB &amp; DTH"
+                android:textColor="#8EA4C4"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabCatFireTv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_unselected"
+                android:gravity="center"
+                android:text="🔥 FIRE TV &amp; STICK"
+                android:textColor="#8EA4C4"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabCatAc"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_unselected"
+                android:gravity="center"
+                android:text="❄️ AC"
+                android:textColor="#8EA4C4"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabCatFan"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_unselected"
+                android:gravity="center"
+                android:text="🌀 FAN"
+                android:textColor="#8EA4C4"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tabCatBt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/remote_cat_tab_unselected"
+                android:gravity="center"
+                android:text="🔵 BLUETOOTH"
+                android:textColor="#8EA4C4"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Transmission Feedback Banner -->
+    <TextView
+        android:id="@+id/tvRemoteFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/pill_badge_bg"
+        android:backgroundTint="#141E33"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp"
+        android:text="⚡ Ready • Select category &amp; brand"
+        android:textColor="#8EA4C4"
+        android:textSize="11sp"
+        android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Scrollable Remote Body -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+
+            <!-- Brand / Target Preset Selector Spinner -->
+            <LinearLayout
+                android:id="@+id/layoutBrandSelector"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:background="@drawable/key_btn_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvBrandPrefix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TARGET:"
+                    android:textColor="#00D2FF"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:layout_marginEnd="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerBrand"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:popupBackground="#0F1726"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 1. TV CONTROLS -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutTvControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <!-- Top Row: Power / Mute / Input / Menu -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnRemotePower"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/remote_btn_power"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="#FF453A" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnRemoteMute"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/key_btn_bg"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_speaker_mute"
+                            app:tint="#FFFFFF" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnRemoteSource"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="INPUT"
+                        android:textColor="#00D2FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:padding="0dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="MENU"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- Volume and Channel Controls Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnVolDown"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="VOL−"
+                            android:textColor="#00D2FF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔊"
+                            android:textSize="16sp"
+                            android:layout_marginHorizontal="6dp" />
+
+                        <Button
+                            android:id="@+id/btnVolUp"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="VOL+"
+                            android:textColor="#00D2FF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="36dp"
+                        android:background="#203350"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnChDown"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="CH−"
+                            android:textColor="#BF5AF2"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📺"
+                            android:textSize="16sp"
+                            android:layout_marginHorizontal="6dp" />
+
+                        <Button
+                            android:id="@+id/btnChUp"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="CH+"
+                            android:textColor="#BF5AF2"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Circular Navigation D-PAD -->
+                <RelativeLayout
+                    android:id="@+id/remoteDpadContainer"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/remote_dpad_bg"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnDpadUp"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▲"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnDpadDown"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▼"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnDpadLeft"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="◀"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnDpadRight"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▶"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnDpadOk"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/remote_ok_btn"
+                        android:text="OK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <!-- Navigation Flank Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnRemoteBack"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⮌ BACK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteHome"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🏠 HOME"
+                        android:textColor="#00FF88"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteFullscreen"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⛶ FULL"
+                        android:textColor="#00D2FF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteExit"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="✕ ESC"
+                        android:textColor="#FF9500"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- Media Playback Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnRemotePrev"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏮"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:padding="0dp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteRewind"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏪"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:padding="0dp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnRemotePlayPause"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.4"
+                        android:background="@drawable/btn_connect_bg"
+                        android:text="⏯ PLAY"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteFastForward"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏩"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:padding="0dp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnRemoteNext"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏭"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- Quick Toggle for Numpad -->
+                <Button
+                    android:id="@+id/btnToggleNumpad"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:background="@drawable/btn_scan_bg"
+                    android:text="🔢 SHOW NUMBER PAD &amp; QUICK SHORTCUTS"
+                    android:textColor="#8EA4C4"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:layout_marginBottom="6dp" />
+
+                <!-- Collapsible Numpad Grid -->
+                <LinearLayout
+                    android:id="@+id/layoutNumpad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="@drawable/card_glass_bg"
+                    android:padding="10dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnNum1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="2" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="3" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnNum4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="4" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="5" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="6" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnNum7" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="7" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum8" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="8" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum9" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="9" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:orientation="horizontal">
+                        <Button android:id="@+id/btnKeySpace" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="SPACE" android:textColor="#00D2FF" android:textSize="11sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnNum0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="0" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnKeyTaskMgr" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="TASK" android:textColor="#BF5AF2" android:textSize="11sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 2. SET-TOP BOX & DTH CONTROLS (Jio STB, Sun Direct, Tata Play...) -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutStbControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- STB Top Row: Power / Mute / Guide (EPG) / Info -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnStbPower"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/remote_btn_power"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="10dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="#FF453A" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnStbMute"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/key_btn_bg"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="10dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_speaker_mute"
+                            app:tint="#FFFFFF" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnStbGuide"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="GUIDE / EPG"
+                        android:textColor="#00D2FF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnStbInfo"
+                        android:layout_width="0dp"
+                        android:layout_height="46dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="ℹ INFO"
+                        android:textColor="#00FF88"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- STB Volume and Channel Controls Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="10dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnStbVolDown"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="VOL−"
+                            android:textColor="#00D2FF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔊"
+                            android:textSize="16sp"
+                            android:layout_marginHorizontal="6dp" />
+
+                        <Button
+                            android:id="@+id/btnStbVolUp"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="VOL+"
+                            android:textColor="#00D2FF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="36dp"
+                        android:background="#203350"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnStbChDown"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="CH−"
+                            android:textColor="#BF5AF2"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📡"
+                            android:textSize="16sp"
+                            android:layout_marginHorizontal="6dp" />
+
+                        <Button
+                            android:id="@+id/btnStbChUp"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/remote_dpad_btn"
+                            android:text="CH+"
+                            android:textColor="#BF5AF2"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold"
+                            android:padding="0dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- STB Circular Navigation D-PAD -->
+                <RelativeLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/remote_dpad_bg"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnStbDpadUp"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▲"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnStbDpadDown"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▼"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnStbDpadLeft"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="◀"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnStbDpadRight"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▶"
+                        android:textColor="#00D2FF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnStbDpadOk"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/remote_ok_btn"
+                        android:text="OK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <!-- STB Navigation Flank Row (Back / Home/Jio / Menu / Exit) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnStbBack"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⮌ BACK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbHome"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🏠 JIO/HOME"
+                        android:textColor="#00FF88"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="MENU"
+                        android:textColor="#00D2FF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbExit"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="✕ EXIT"
+                        android:textColor="#FF9500"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- 4 Indian STB Color Buttons: Red, Green, Yellow, Blue -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnStbRed"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_btn_red"
+                        android:text="🔴 FAV"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbGreen"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_btn_green"
+                        android:text="🟢 LANG"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbYellow"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_btn_yellow"
+                        android:text="🟡 AUDIO"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnStbBlue"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_btn_blue"
+                        android:text="🔵 SUBS"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:padding="0dp" />
+                </LinearLayout>
+
+                <!-- STB 0-9 Direct Numpad Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:padding="10dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CHANNEL NUMBER INPUT"
+                        android:textColor="#8EA4C4"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnStbNum1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="2" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="3" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnStbNum4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="4" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="5" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="6" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+                        <Button android:id="@+id/btnStbNum7" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="7" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum8" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="8" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum9" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="9" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal">
+                        <Button android:id="@+id/btnStbRewind" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="⏪" android:textColor="#00D2FF" android:textSize="14sp" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbNum0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="0" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="6dp" />
+                        <Button android:id="@+id/btnStbPlayPause" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="⏯" android:textColor="#00FF88" android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 3. AMAZON FIRE TV & STREAMING STICK CONTROLS -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutFireTvControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Fire TV Badge Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/remote_display_bg"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/tvFireTvBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🔥 AMAZON FIRE TV CONTROLLER"
+                        android:textColor="#FF9900"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Supports IR Blaster • Bluetooth Media • Direct WiFi ADB"
+                        android:textColor="#8EA4C4"
+                        android:textSize="10sp"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Fire TV Top Row: Power / Alexa Voice / Menu ≡ / Mute -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnFirePower"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/remote_btn_power"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="10dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="#FF453A" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnFireAlexa"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1.2"
+                        android:background="@drawable/btn_connect_bg"
+                        android:text="🎤 ALEXA"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnFireMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="OPTIONS ≡"
+                        android:textColor="#00D2FF"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <LinearLayout
+                        android:id="@+id/btnFireMute"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/key_btn_bg"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_speaker_mute"
+                            app:tint="#FFFFFF" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Fire TV Navigation Ring D-PAD -->
+                <RelativeLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/remote_dpad_bg"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnFireDpadUp"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▲"
+                        android:textColor="#FF9900"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnFireDpadDown"
+                        android:layout_width="56dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▼"
+                        android:textColor="#FF9900"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnFireDpadLeft"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="◀"
+                        android:textColor="#FF9900"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnFireDpadRight"
+                        android:layout_width="50dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="▶"
+                        android:textColor="#FF9900"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnFireDpadSelect"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/remote_ok_btn"
+                        android:text="SELECT"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+                <!-- Fire TV Navigation Row (Back / Home / Menu) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnFireBack"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⮌ BACK"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnFireHome"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🏠 HOME"
+                        android:textColor="#00FF88"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnFireOptions"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="≡ MENU"
+                        android:textColor="#00D2FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Fire TV Playback & Volume Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnFireRewind"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏪ 10s"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnFirePlayPause"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.3"
+                        android:background="@drawable/btn_connect_bg"
+                        android:text="⏯ PLAY"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnFireFastForward"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏩ 10s"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnFireVolDown"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.9"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="VOL−"
+                        android:textColor="#00D2FF"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="4dp" />
+
+                    <Button
+                        android:id="@+id/btnFireVolUp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.9"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="VOL+"
+                        android:textColor="#00D2FF"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Streaming Apps Quick Launch Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:padding="10dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="QUICK APP LAUNCHERS"
+                        android:textColor="#8EA4C4"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="6dp">
+
+                        <Button
+                            android:id="@+id/btnFireAppPrime"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/remote_btn_app"
+                            android:text="prime video"
+                            android:textColor="#00A8E1"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <Button
+                            android:id="@+id/btnFireAppNetflix"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/remote_btn_app"
+                            android:text="NETFLIX"
+                            android:textColor="#E50914"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnFireAppYoutube"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/remote_btn_app"
+                            android:text="▶ YouTube"
+                            android:textColor="#FF0000"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <Button
+                            android:id="@+id/btnFireAppHotstar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/remote_btn_app"
+                            android:text="JioCinema / Hotstar"
+                            android:textColor="#00D2FF"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Optional Direct WiFi Fire TV IP Connector -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:padding="8dp"
+                    android:layout_marginBottom="12dp">
+
+                    <EditText
+                        android:id="@+id/etFireTvIp"
+                        android:layout_width="0dp"
+                        android:layout_height="38dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/edittext_bg"
+                        android:hint="Fire TV IP (e.g. 192.168.1.50)"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#4F6785"
+                        android:textSize="11sp"
+                        android:paddingHorizontal="10dp"
+                        android:singleLine="true" />
+
+                    <Button
+                        android:id="@+id/btnSetFireTvIp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:background="@drawable/btn_scan_bg"
+                        android:text="SET IP"
+                        android:textColor="#00FF88"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:paddingHorizontal="12dp"
+                        android:layout_marginStart="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 4. AIR CONDITIONER (AC) CONTROLS -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutAcControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- High-Tech AC Cockpit Display Screen -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/remote_display_bg"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:id="@+id/tvAcBrandBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="VOLTAS DUAL INVERTER"
+                            android:textColor="#00D2FF"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05" />
+
+                        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/tvAcPowerStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🟢 POWER ON"
+                            android:textColor="#00FF88"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Digital Temperature Readout -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginVertical="8dp">
+
+                        <TextView
+                            android:id="@+id/tvAcTemp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="24"
+                            android:textColor="#FFFFFF"
+                            android:textSize="64sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="°C"
+                            android:textColor="#00D2FF"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="top"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+
+                    <!-- AC Indicators Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvAcModeBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#2600D2FF"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="❄️ COOL"
+                            android:textColor="#00D2FF"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/tvAcFanBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#26BF5AF2"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="💨 FAN: AUTO"
+                            android:textColor="#BF5AF2"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/tvAcSwingBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#2600FF88"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="↕️ SWING ON"
+                            android:textColor="#00FF88"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- AC Power & Function Controls Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnAcPower"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/remote_btn_power"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="10dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="#FF453A" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnAcMode"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🔄 MODE"
+                        android:textColor="#00D2FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnAcFanSpeed"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="💨 SPEED"
+                        android:textColor="#BF5AF2"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnAcSwing"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="↕️ SWING"
+                        android:textColor="#00FF88"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Temperature Large Adjust Rocker Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/card_glass_bg"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnAcTempDown"
+                        android:layout_width="0dp"
+                        android:layout_height="54dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="− TEMP"
+                        android:textColor="#00D2FF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌡️"
+                        android:textSize="24sp"
+                        android:layout_marginHorizontal="16dp" />
+
+                    <Button
+                        android:id="@+id/btnAcTempUp"
+                        android:layout_width="0dp"
+                        android:layout_height="54dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/remote_dpad_btn"
+                        android:text="+ TEMP"
+                        android:textColor="#FF453A"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Quick Presets (Turbo & Eco) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnAcTurbo"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_connect_bg"
+                        android:text="⚡ TURBO COOL"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnAcEco"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_scan_bg"
+                        android:text="🌱 ECO (26°C)"
+                        android:textColor="#00FF88"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 5. SMART BLDC FAN CONTROLS -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutFanControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Fan Cockpit Display -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/remote_display_bg"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:layout_marginBottom="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="6dp">
+
+                        <TextView
+                            android:id="@+id/tvFanBrandBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ATOMBERG RENESA BLDC"
+                            android:textColor="#00D2FF"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05" />
+
+                        <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/tvFanPowerStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🟢 RUNNING"
+                            android:textColor="#00FF88"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginVertical="8dp">
+
+                        <TextView
+                            android:id="@+id/tvFanSpeedNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="3"
+                            android:textColor="#FFFFFF"
+                            android:textSize="64sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="SPD"
+                            android:textColor="#00D2FF"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:layout_gravity="top"
+                            android:layout_marginTop="12dp"
+                            android:layout_marginStart="4dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/tvFanBreezeBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#2600D2FF"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="🍃 NORMAL"
+                            android:textColor="#00D2FF"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/tvFanTimerBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#26BF5AF2"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="⏱ TIMER: OFF"
+                            android:textColor="#BF5AF2"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:layout_marginEnd="6dp" />
+
+                        <TextView
+                            android:id="@+id/tvFanLedBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/pill_badge_bg"
+                            android:backgroundTint="#2600FF88"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="4dp"
+                            android:text="💡 LIGHT OFF"
+                            android:textColor="#00FF88"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Fan Main Controls Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnFanPower"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:background="@drawable/remote_btn_power"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_marginEnd="10dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_power_off"
+                            app:tint="#FF453A" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnFanBreeze"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🍃 BREEZE"
+                        android:textColor="#00D2FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnFanTimer"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏱ TIMER"
+                        android:textColor="#BF5AF2"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnFanLight"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="💡 LED"
+                        android:textColor="#FFCC00"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Direct Speed Buttons Row (1, 2, 3, 4, 5, BOOST) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SPEED SELECTION"
+                    android:textColor="#8EA4C4"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <Button android:id="@+id/btnFanSp1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="1" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="4dp" />
+                    <Button android:id="@+id/btnFanSp2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="2" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="4dp" />
+                    <Button android:id="@+id/btnFanSp3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="3" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="4dp" />
+                    <Button android:id="@+id/btnFanSp4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="4" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="4dp" />
+                    <Button android:id="@+id/btnFanSp5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:background="@drawable/remote_key_num_bg" android:text="5" android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" android:layout_marginEnd="4dp" />
+                    <Button android:id="@+id/btnFanBoost" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1.4" android:background="@drawable/btn_connect_bg" android:text="🔥 BOOST" android:textColor="#FFFFFF" android:textSize="11sp" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============================================================= -->
+            <!-- 6. BLUETOOTH DEVICES CONTROLS -->
+            <!-- ============================================================= -->
+            <LinearLayout
+                android:id="@+id/layoutBluetoothControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Bluetooth Status Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/card_glass_bg"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BLUETOOTH AUDIO &amp; DEVICE CONTROLLER"
+                        android:textColor="#00D2FF"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.05"
+                        android:layout_marginBottom="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvBluetoothStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ready • Controls connected BT speakers, TV, soundbar or earphones"
+                        android:textColor="#8EA4C4"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="10dp" />
+
+                    <TextView
+                        android:id="@+id/tvBtDevicesList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Paired devices will respond to volume &amp; media commands"
+                        android:textColor="#00FF88"
+                        android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <!-- Bluetooth Volume Controls -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnBtVolDown"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_scan_bg"
+                        android:text="🔉 BT VOL −"
+                        android:textColor="#00D2FF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnBtMute"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="🔇 MUTE"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnBtVolUp"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/btn_scan_bg"
+                        android:text="🔊 BT VOL +"
+                        android:textColor="#00D2FF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Bluetooth Media Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <Button
+                        android:id="@+id/btnBtPrev"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏮ PREV"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnBtPlayPause"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.4"
+                        android:background="@drawable/btn_connect_bg"
+                        android:text="⏯ PLAY / PAUSE"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="6dp" />
+
+                    <Button
+                        android:id="@+id/btnBtNext"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/key_btn_bg"
+                        android:text="⏭ NEXT"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

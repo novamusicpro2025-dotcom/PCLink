@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/bg_cockpit_depth">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Top Header Title -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_nav_media"
+                app:tint="#00D2FF" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Audio &amp; Display Hub"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Media playback and screen streaming"
+                    android:textColor="#6E829F"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Top Right Remote Control Button -->
+            <LinearLayout
+                android:id="@+id/btnOpenRemote"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/btn_remote_badge_bg"
+                android:paddingHorizontal="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_remote_control"
+                    app:tint="#00D2FF"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="REMOTE"
+                    android:textColor="#00D2FF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Media Playback Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NOW PLAYING ON PC"
+                android:textColor="#00D2FF"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:id="@+id/tvMediaTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Spotify • YouTube • Browser"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Prev / Play / Next Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btnMediaPrev"
+                    android:layout_width="60dp"
+                    android:layout_height="44dp"
+                    android:text="⏮"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_scan_bg"
+                    android:layout_marginEnd="14dp" />
+
+                <Button
+                    android:id="@+id/btnMediaPlayPause"
+                    android:layout_width="110dp"
+                    android:layout_height="48dp"
+                    android:text="⏯ PLAY"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_connect_bg"
+                    android:layout_marginEnd="14dp" />
+
+                <Button
+                    android:id="@+id/btnMediaNext"
+                    android:layout_width="60dp"
+                    android:layout_height="44dp"
+                    android:text="⏭"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_scan_bg" />
+            </LinearLayout>
+
+            <!-- Volume Presets Row -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VOLUME PRESETS"
+                android:textColor="#8A9BB5"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnVol25"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:text="25%"
+                    android:textSize="11sp"
+                    android:textColor="#A0B0C8"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnVol50"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:text="50%"
+                    android:textSize="11sp"
+                    android:textColor="#A0B0C8"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnVol75"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:text="75%"
+                    android:textSize="11sp"
+                    android:textColor="#A0B0C8"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnVol100"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:text="100%"
+                    android:textSize="11sp"
+                    android:textColor="#00D2FF"
+                    android:background="@drawable/key_btn_bg" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Live PC Screen Continuous Stream Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <!-- 1. Header Bar: Title on Left, Status Badge on Right -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/tvLiveStreamTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="LIVE PC SCREEN STREAM"
+                    android:textColor="#00D2FF"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/tvLiveStreamBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="⏸ TAP LIVE STREAM TO START"
+                    android:textColor="#8A9BB5"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+            <!-- 2. Compact Stream Action Toolbar (Small Buttons - No Overlap!) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:id="@+id/btnToggleLiveStream"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.3"
+                    android:text="🔴 LIVE STREAM"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_connect_bg"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="0dp"
+                    android:layout_marginEnd="6dp" />
+
+                <Button
+                    android:id="@+id/btnRefreshScreenshot"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.2"
+                    android:text="📷 SNAP"
+                    android:textColor="#00D2FF"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_scan_bg"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="0dp"
+                    android:layout_marginEnd="6dp" />
+
+                <Button
+                    android:id="@+id/btnStreamQuality"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:text="💎 1080p HD"
+                    android:textColor="#00FF88"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="0dp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="210dp"
+                android:background="#070E1C">
+
+                <ImageView
+                    android:id="@+id/ivScreenshot"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Live PC Screen" />
+
+                <TextView
+                    android:id="@+id/tvScreenEmptyHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="🖥️\nClick 🔴 LIVE STREAM to view\nPC screen in real-time"
+                    android:textColor="#4A5D78"
+                    android:textSize="11sp" />
+
+                <ImageButton
+                    android:id="@+id/btnFullscreenScreen"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/btn_scan_bg"
+                    android:src="@drawable/ic_scan_search"
+                    app:tint="#00D2FF"
+                    android:contentDescription="Fullscreen View" />
+            </FrameLayout>
+
+            <!-- Touch Control Guidance Badge -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="5dp"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/tvTouchStatusHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👆 Touch screen to click • Hold for Right-Click • Drag to move"
+                    android:textColor="#8A9BB5"
+                    android:textSize="9.5sp" />
+            </LinearLayout>
+
+            <!-- Row 1: System & Clipboard Small Buttons (4 small buttons) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp">
+
+                <Button
+                    android:id="@+id/btnQuickWin"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="🪟 WIN"
+                    android:textColor="#00D2FF"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnQuickCopy"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.2"
+                    android:text="📋 COPY"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnQuickPaste"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.2"
+                    android:text="📄 PASTE"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnQuickBw"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="🌓 B&amp;W"
+                    android:textColor="#FFD700"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:padding="0dp" />
+            </LinearLayout>
+
+            <!-- Row 2: Navigation & Lock Small Buttons (5 small buttons) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp">
+
+                <Button
+                    android:id="@+id/btnQuickScrollUp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.9"
+                    android:text="▲ UP"
+                    android:textColor="#00FF88"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="3dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnQuickScrollDown"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.9"
+                    android:text="▼ DN"
+                    android:textColor="#00FF88"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="3dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnLiveLock"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="🔒 LOCK"
+                    android:textColor="#FFB800"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="3dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnLiveUnlock"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:text="🔓 UNLOCK"
+                    android:textColor="#00FF88"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="3dp"
+                    android:padding="0dp" />
+
+                <Button
+                    android:id="@+id/btnLiveAntiIdle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:text="☕ IDLE"
+                    android:textColor="#00D2FF"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/key_btn_bg"
+                    android:padding="0dp" />
+            </LinearLayout>
+
+            <!-- Row 3: Quick Text Input & Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="6dp">
+
+                <EditText
+                    android:id="@+id/etQuickSendText"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/edittext_bg"
+                    android:hint="Type text to type on PC..."
+                    android:textColorHint="#4A5F80"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11.5sp"
+                    android:paddingHorizontal="10dp"
+                    android:imeOptions="actionSend"
+                    android:inputType="text"
+                    android:layout_marginEnd="5dp" />
+
+                <Button
+                    android:id="@+id/btnQuickSendText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="SEND ➔"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_connect_bg"
+                    android:paddingHorizontal="9dp"
+                    android:layout_marginEnd="3dp" />
+
+                <Button
+                    android:id="@+id/btnQuickBackspace"
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:text="⌫"
+                    android:textColor="#FF453A"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_scan_bg"
+                    android:padding="0dp"
+                    android:layout_marginEnd="3dp" />
+
+                <Button
+                    android:id="@+id/btnQuickEnter"
+                    android:layout_width="32dp"
+                    android:layout_height="match_parent"
+                    android:text="↵"
+                    android:textColor="#00FF88"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_scan_bg"
+                    android:padding="0dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Phone-to-PC Screen Cast Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_pod_bg"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="14dp">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/badge_glow_cyan"
+                android:layout_marginEnd="12dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_pc_monitor"
+                    app:tint="#00D2FF" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone Screen Cast to PC"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvMirrorStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stream this phone's screen live to PC"
+                    android:textColor="#8A9BB5"
+                    android:textSize="10.5sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnToggleMirror"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="START"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:background="@drawable/btn_connect_bg"
+                android:paddingHorizontal="14dp" />
+        </LinearLayout>
+
+        <!-- Presentation Remote (Slide Clicker) Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_glass_bg"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PRESENTATION REMOTE (SLIDE CLICKER)"
+                android:textColor="#00FF88"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PowerPoint • Google Slides • PDF"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Large Prev & Next Slide Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:id="@+id/btnPptPrev"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="◀ PREV SLIDE"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_scan_bg"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnPptNext"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="NEXT SLIDE ▶"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/btn_connect_bg" />
+            </LinearLayout>
+
+            <!-- Secondary PPT Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnPptStart"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:text="📽 Start (F5)"
+                    android:textSize="10.5sp"
+                    android:textColor="#00FF88"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnPptBlack"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:text="⬛ Blank (B)"
+                    android:textSize="10.5sp"
+                    android:textColor="#FF9F0A"
+                    android:background="@drawable/key_btn_bg"
+                    android:layout_marginEnd="4dp" />
+
+                <Button
+                    android:id="@+id/btnPptExit"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:text="✕ Exit (Esc)"
+                    android:textSize="10.5sp"
+                    android:textColor="#FF453A"
+                    android:background="@drawable/key_btn_bg" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

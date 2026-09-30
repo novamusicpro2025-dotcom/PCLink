@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.PCMasterControl" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#060912</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">#00D2FF</item>
+        <item name="android:windowBackground">#060912</item>
+        <item name="android:navigationBarColor">#060912</item>
+    </style>
+</resources>
