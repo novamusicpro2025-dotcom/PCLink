@@ -941,6 +941,7 @@ private bool ValidateAuth(HttpListenerRequest req)
 			RunCommand("powercfg /setactive " + plan switch
 			{
 				"saver" => "a1841308-3541-4fab-bc81-f71556f20b4a", 
+				"powersaver" => "a1841308-3541-4fab-bc81-f71556f20b4a",
 				"balanced" => "381b4222-f694-41f0-9685-ff5bb260df2e", 
 				"high" => "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", 
 				"ultimate" => "e9a42b02-d5df-448d-aa00-03f14749eb61", 
@@ -2362,6 +2363,28 @@ var value2 = new
 						SendString(response, "{\"status\":\"ok\",\"active\":" + (_isAntiIdleActive ? "true" : "false") + "}", "application/json");
 						return;
 					}
+					if (text8 == "timer")
+					{
+						string timerAction = (request.QueryString["action"] ?? "").ToLowerInvariant();
+						if (timerAction == "cancel")
+						{
+							ScheduleTimer("abort", 0);
+							SendString(response, "{\"status\":\"ok\"}", "application/json");
+							return;
+						}
+
+						if ((timerAction != "shutdown" && timerAction != "restart" && timerAction != "sleep") ||
+							!int.TryParse(request.QueryString["minutes"], out int timerMinutes) || timerMinutes < 1 || timerMinutes > 10080)
+						{
+							response.StatusCode = 400;
+							SendString(response, "{\"status\":\"error\",\"message\":\"A valid timer action and 1-10080 minutes are required\"}", "application/json");
+							return;
+						}
+
+						ScheduleTimer(timerAction, timerMinutes);
+						SendString(response, "{\"status\":\"ok\"}", "application/json");
+						return;
+					}
 					if (text8 == "openfiles")
 					{
 						Dispatcher.Invoke(() =>
@@ -2390,6 +2413,7 @@ var value2 = new
 					try
 					{
 						string fullPath = System.IO.Path.GetFullPath(text10);
+						AddToLog("Download request path: " + text10 + " -> fullPath: " + fullPath + " IsRooted: " + System.IO.Path.IsPathRooted(fullPath));
 						// Security: block UNC paths and non-local paths, but allow all local drives (C:\, D:\, etc.)
 						if (fullPath.StartsWith("\\\\") || !System.IO.Path.IsPathRooted(fullPath))
 						{

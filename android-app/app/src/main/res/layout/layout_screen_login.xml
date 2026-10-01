@@ -553,6 +553,45 @@
                     android:textSize="11.5sp"
                     android:lineSpacingExtra="2dp" />
             </LinearLayout>
+
+            <!-- 📥 Download PC Client Button -->
+            <LinearLayout
+                android:id="@+id/btnLoginDownloadPc"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:background="@drawable/btn_scan_bg"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:layout_marginTop="12dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_pc_monitor"
+                    app:tint="#00D2FF"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📥 DOWNLOAD PC CLIENT (EXE)"
+                    android:textColor="#00D2FF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.05" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="↗"
+                    android:textColor="#00D2FF"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="6dp" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- ============================================== -->
@@ -707,7 +746,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1. Open PC Master on your Windows PC.\n2. In the top bar, you will see your IP:Port (e.g., 192.168.1.100:8099).\n3. Make sure your phone and PC are connected to the same Wi-Fi or Mobile Hotspot.\n4. Enter the IP &amp; Port above and tap 'LOGIN &amp; CONNECT'."
+                android:text="1. Don't have PC Master yet? Tap 'DOWNLOAD PC CLIENT (EXE)' above to get it on your computer.\n2. Open PC Master on your Windows PC.\n3. In the top bar, you will see your IP:Port (e.g., 192.168.1.100:8099).\n4. Make sure your phone and PC are connected to the same Wi-Fi or Mobile Hotspot.\n5. Enter the IP &amp; Port above and tap 'LOGIN &amp; CONNECT'."
                 android:textColor="#6E829F"
                 android:textSize="11.5sp"
                 android:lineSpacingExtra="3dp" />

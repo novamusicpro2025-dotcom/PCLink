@@ -492,9 +492,10 @@ object PcApiClient {
         }
     }
 
-    fun getFileList(path: String = "", onResult: (List<FileItem>) -> Unit) {
+    fun getFileList(path: String = "", onResult: (List<FileItem>, String?) -> Unit) {
         executor.execute {
             val files = mutableListOf<FileItem>()
+            var errorMsg: String? = null
             try {
                 val query = if (path.isNotEmpty()) "?path=${URLEncoder.encode(path, "UTF-8").replace("+", "%20")}" else ""
                 val conn = openConnection("/list$query", timeoutMs = 4000)
@@ -513,12 +514,15 @@ object PcApiClient {
                             )
                         )
                     }
+                } else {
+                    errorMsg = "Server error: HTTP ${conn.responseCode}"
                 }
                 conn.disconnect()
             } catch (e: Exception) {
                 Log.e(TAG, "getFileList error: ${e.message}")
+                errorMsg = e.message ?: "Connection failed"
             }
-            mainHandler.post { onResult(files) }
+            mainHandler.post { onResult(files, errorMsg) }
         }
     }
 

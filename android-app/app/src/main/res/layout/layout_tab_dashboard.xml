@@ -83,13 +83,6 @@
                         android:src="@drawable/ic_settings_gear"
                         android:contentDescription="Settings"
                         android:layout_marginEnd="12dp" />
-
-                    <ImageView
-                        android:id="@+id/btnMoreMenu"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_more_dots"
-                        android:contentDescription="More" />
                 </LinearLayout>
 
                 <!-- Status Pill -->
@@ -1665,21 +1658,7 @@
             </LinearLayout>
         </GridLayout>
 
-        <!-- FIND MY PC BUTTON -->
-        <Button
-            android:id="@+id/btnFindPc"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="12dp"
-            android:text="🔊 FIND MY PC"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/key_btn_bg" />
-
-
-
-        <!-- ============================================== -->
+<!-- ============================================== -->
         <!-- CLIPBOARD SYNC SECTION                        -->
         <!-- ============================================== -->
         <LinearLayout
@@ -1764,7 +1743,8 @@
             android:layout_marginTop="14dp"
             android:background="@drawable/card_glass_bg"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -1843,7 +1823,8 @@
             android:layout_marginTop="14dp"
             android:background="@drawable/card_glass_bg"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -1937,7 +1918,8 @@
             android:layout_marginTop="14dp"
             android:background="@drawable/card_glass_bg"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -2000,7 +1982,8 @@
             android:layout_marginTop="14dp"
             android:background="@drawable/card_glass_bg"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -2106,7 +2089,8 @@
             android:layout_marginTop="14dp"
             android:background="@drawable/card_glass_bg"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:padding="14dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"

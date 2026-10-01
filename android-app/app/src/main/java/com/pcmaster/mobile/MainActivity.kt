@@ -348,11 +348,15 @@ class MainActivity : AppCompatActivity() {
 
                 // 1. If currently inside a folder/drive in Files tab, navigate up
                 if (tabFilesView.isVisible && currentFolderPath.isNotEmpty()) {
-                    val parent = File(currentFolderPath).parent
-                    if (parent == null || currentFolderPath.matches(Regex("^[a-zA-Z]:[/\\\\]?$"))) {
+                    if (isDriveRoot(currentFolderPath)) {
                         loadSharedFiles("")
                     } else {
-                        loadSharedFiles(parent)
+                        val parent = getParentWindowsPath(currentFolderPath)
+                        if (parent != null) {
+                            loadSharedFiles(parent)
+                        } else {
+                            loadSharedFiles("")
+                        }
                     }
                     return
                 }
@@ -410,41 +414,7 @@ class MainActivity : AppCompatActivity() {
             showLoginScreen()
         }
         handleSharedUrl(intent)
-        handleIncomingRing(intent)
-        val ringFilter = IntentFilter("com.pcmaster.mobile.RING_PHONE")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(ringBroadcastReceiver, ringFilter, RECEIVER_EXPORTED)
-        } else {
-            @Suppress("UnspecifiedRegisterReceiverFlag")
-            registerReceiver(ringBroadcastReceiver, ringFilter)
         }
-    }
-
-    private val ringBroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.pcmaster.mobile.RING_PHONE") {
-                showToast("🔔 Ringing phone from PC...")
-                PcApiClient.findMyPhone(this@MainActivity)
-            }
-        }
-    }
-
-    private fun handleIncomingRing(intent: Intent?) {
-        if (intent == null) return
-        val action = intent.action
-        val extraAction = intent.getStringExtra("action")
-        if (action == "com.pcmaster.mobile.RING_PHONE" || extraAction == "ring") {
-            showToast("🔔 Ringing phone from PC...")
-            PcApiClient.findMyPhone(this)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        handleSharedUrl(intent)
-        handleIncomingRing(intent)
-    }
 
     private fun initViews() {
         // Dedicated Login Screen Views
@@ -634,7 +604,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnSettings?.setOnClickListener { showSettingsMenuDialog() }
-        findViewById<View?>(R.id.btnMoreMenu)?.setOnClickListener { showSettingsMenuDialog() }
 
         // Click status pill to disconnect / switch PC
         statusPillHeader?.setOnClickListener {
@@ -715,6 +684,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<View?>(R.id.btnLoginPrivacyPolicy)?.setOnClickListener {
             openPrivacyPolicyUrl()
+        }
+
+        findViewById<View?>(R.id.btnLoginDownloadPc)?.setOnClickListener {
+            openPcDownloadPage()
         }
     }
 
@@ -1259,6 +1232,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun openPcDownloadPage() {
+        val url = "https://myapp-official.blogspot.com/p/pc-master.html"
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        } catch (e: Exception) {
+            showToast("Could not open browser: ${e.message}")
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun performConnect(ip: String, port: String, manualToken: String, isSilent: Boolean = false) {
         val connection = parseConnectionDetails(ip, port, manualToken)
@@ -1431,16 +1413,10 @@ class MainActivity : AppCompatActivity() {
 
         updateQuickHubStatus()
 
-        findViewById<View?>(R.id.btnFindPc)?.setOnClickListener {
-            PcApiClient.sendRemoteCommand("findmypc") { success ->
-                showToast(if (success) "🔊 Alerting PC!" else "Failed to alert PC")
-            }
-        }
-
         // ── POWER PLAN ──────────────────────────────────────
         val tvPowerPlan = findViewById<TextView?>(R.id.tvCurrentPowerPlan)
         findViewById<View?>(R.id.btnPowerSaver)?.setOnClickListener {
-            PcApiClient.sendRemoteCommand("powerplan", mapOf("plan" to "powersaver")) { success ->
+            PcApiClient.sendRemoteCommand("powerplan", mapOf("plan" to "saver")) { success ->
                 if (success) { showToast("🔋 Power Saver activated"); tvPowerPlan?.text = "Power Saver" }
                 else showToast("Failed to change power plan")
             }
@@ -1461,8 +1437,7 @@ class MainActivity : AppCompatActivity() {
         // ── SHUTDOWN TIMER ──────────────────────────────────
         val btnCancelTimer = findViewById<Button?>(R.id.btnCancelShutdownTimer)
         fun setShutdownTimer(minutes: Int) {
-            val seconds = minutes * 60
-            PcApiClient.sendRemoteCommand("timer", mapOf("seconds" to "$seconds", "action" to "shutdown")) { success ->
+            PcApiClient.sendRemoteCommand("timer", mapOf("minutes" to "$minutes", "action" to "shutdown")) { success ->
                 if (success) {
                     showToast("⏰ PC shuts down in $minutes min")
                     btnCancelTimer?.visibility = android.view.View.VISIBLE
@@ -2111,6 +2086,134 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val appPowerPlan = tabAppsView.findViewById<TextView>(R.id.appCurrentPowerPlan)
+        val appCancelTimer = tabAppsView.findViewById<Button>(R.id.appBtnCancelShutdownTimer)
+
+        fun setAppPowerPlan(plan: String, label: String) {
+            PcApiClient.sendRemoteCommand("powerplan", mapOf("plan" to plan)) { success ->
+                if (success) {
+                    appPowerPlan.text = label
+                    showToast("$label power plan activated")
+                } else {
+                    showToast("Failed to change power plan")
+                }
+            }
+        }
+
+        tabAppsView.findViewById<View>(R.id.appBtnPowerSaver).setOnClickListener {
+            setAppPowerPlan("saver", "Power Saver")
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnPowerBalanced).setOnClickListener {
+            setAppPowerPlan("balanced", "Balanced")
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnPowerHigh).setOnClickListener {
+            setAppPowerPlan("high", "High Performance")
+        }
+
+        fun setAppShutdownTimer(minutes: Int) {
+            PcApiClient.sendRemoteCommand("timer", mapOf("minutes" to "$minutes", "action" to "shutdown")) { success ->
+                if (success) {
+                    appCancelTimer.visibility = View.VISIBLE
+                    showToast("PC shuts down in $minutes min")
+                } else {
+                    showToast("Failed to set shutdown timer")
+                }
+            }
+        }
+
+        tabAppsView.findViewById<View>(R.id.appBtnTimer15).setOnClickListener { setAppShutdownTimer(15) }
+        tabAppsView.findViewById<View>(R.id.appBtnTimer30).setOnClickListener { setAppShutdownTimer(30) }
+        tabAppsView.findViewById<View>(R.id.appBtnTimer60).setOnClickListener { setAppShutdownTimer(60) }
+        tabAppsView.findViewById<View>(R.id.appBtnTimerCustom).setOnClickListener {
+            val input = EditText(this).apply {
+                hint = "Minutes"
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            }
+            AlertDialog.Builder(this)
+                .setTitle("Custom Shutdown Timer")
+                .setView(input)
+                .setPositiveButton("Set") { _, _ ->
+                    input.text.toString().toIntOrNull()?.takeIf { it > 0 }
+                        ?.let(::setAppShutdownTimer)
+                        ?: showToast("Enter a valid number of minutes")
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+        appCancelTimer.setOnClickListener {
+            PcApiClient.sendRemoteCommand("abort") { success ->
+                if (success) {
+                    appCancelTimer.visibility = View.GONE
+                    showToast("Shutdown timer cancelled")
+                } else {
+                    showToast("Failed to cancel shutdown timer")
+                }
+            }
+        }
+
+        tabAppsView.findViewById<View>(R.id.appBtnMonitorOff).setOnClickListener {
+            PcApiClient.sendRemoteCommand("monoff") { success ->
+                showToast(if (success) "Monitor turned off" else "Failed to turn off monitor")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnSleep).setOnClickListener {
+            PcApiClient.sendRemoteCommand("sleep") { success ->
+                showToast(if (success) "PC entering sleep mode" else "Failed to put PC to sleep")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnToggleDarkMode).setOnClickListener {
+            PcApiClient.sendRemoteCommand("toggledark") { success ->
+                showToast(if (success) "PC theme toggled" else "Failed to toggle PC theme")
+            }
+        }
+
+        tabAppsView.findViewById<View>(R.id.appBtnTaskMgr).setOnClickListener {
+            PcApiClient.sendRemoteCommand("taskmgr") { success ->
+                showToast(if (success) "Task Manager opened" else "Failed to open Task Manager")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnEmptyBin).setOnClickListener {
+            PcApiClient.sendRemoteCommand("emptytrash") { success ->
+                showToast(if (success) "Recycle Bin emptied" else "Failed to empty Recycle Bin")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnKillFrozen).setOnClickListener {
+            PcApiClient.sendRemoteCommand("killnotresponding") { success ->
+                showToast(if (success) "Frozen apps closed" else "Failed to close frozen apps")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnFlushDns).setOnClickListener {
+            PcApiClient.sendRemoteCommand("flushdns") { success ->
+                showToast(if (success) "DNS cache flushed" else "Failed to flush DNS cache")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnClearTemp).setOnClickListener {
+            PcApiClient.sendRemoteCommand("cleartemp") { success ->
+                showToast(if (success) "Temp files cleared" else "Failed to clear temp files")
+            }
+        }
+        tabAppsView.findViewById<View>(R.id.appBtnRestartExplorer).setOnClickListener {
+            PcApiClient.sendRemoteCommand("restartexp") { success ->
+                showToast(if (success) "Explorer restarted" else "Failed to restart Explorer")
+            }
+        }
+
+        val appQuickLaunchButtons = mapOf(
+            R.id.appBtnLaunchNotepad to "notepad",
+            R.id.appBtnLaunchCalc to "calc",
+            R.id.appBtnLaunchChrome to "chrome",
+            R.id.appBtnLaunchSpotify to "spotify",
+            R.id.appBtnLaunchDownloads to "downloads",
+            R.id.appBtnLaunchDocuments to "documents"
+        )
+        for ((viewId, command) in appQuickLaunchButtons) {
+            tabAppsView.findViewById<View>(viewId).setOnClickListener {
+                PcApiClient.sendRemoteCommand(command) { success ->
+                    showToast(if (success) "Launched $command" else "Failed to launch $command")
+                }
+            }
+        }
+
         btnRefreshProcesses.setOnClickListener { loadProcesses() }
 
         processAdapter = object : ArrayAdapter<ProcessItem>(this, R.layout.item_process, processList) {
@@ -2164,7 +2267,7 @@ class MainActivity : AppCompatActivity() {
 
         btnFolderBack?.setOnClickListener {
             if (currentFolderPath.isNotEmpty()) {
-                val parent = File(currentFolderPath).parent
+                val parent = getParentWindowsPath(currentFolderPath)
                 if (parent == null || currentFolderPath.matches(Regex("^[a-zA-Z]:[/\\\\]?$"))) {
                     loadSharedFiles("")
                 } else {
@@ -2195,9 +2298,20 @@ class MainActivity : AppCompatActivity() {
         btnFolderBack?.visibility = if (path.isEmpty()) View.GONE else View.VISIBLE
         tvCurrentFolderPath?.text = if (path.isEmpty()) "Root: PC Drives (C:, D:)" else "Path: $path"
 
-        PcApiClient.getFileList(path) { files ->
+        PcApiClient.getFileList(path) { files, error ->
+            if (error != null) {
+                showToast("Failed to load files: $error")
+                if (path.isEmpty()) {
+                    tvCurrentFolderPath?.text = "Root: PC Drives (C:, D:) - Tap Refresh"
+                }
+                return@getFileList
+            }
             fileList.clear()
             fileList.addAll(files)
+
+            if (path.isEmpty() && files.isEmpty()) {
+                showToast("No drives found. Ensure PC file server is running.")
+            }
 
             val adapter = object : ArrayAdapter<FileItem>(this, R.layout.item_file, fileList) {
                 override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -2212,8 +2326,13 @@ class MainActivity : AppCompatActivity() {
                     val btnDownload = view.findViewById<Button>(R.id.btnDownloadFile)
 
                     if (item != null) {
-                        tvName.text = item.name
-                        tvSize.text = if (item.size.isNotEmpty()) item.size else if (item.isDir) "Folder" else ""
+                        val displayName = if (item.isDir && item.path.matches(Regex("^[a-zA-Z]:[\\\\/]?$"))) {
+                            "Local Disk (${item.path.substring(0, 1).uppercase()}:)"
+                        } else {
+                            item.name
+                        }
+                        tvName.text = displayName
+                        tvSize.text = if (item.size.isNotEmpty()) item.size else if (item.isDir) "Drive" else ""
 
                         if (item.isDir) {
                             tvIcon?.text = "📁"
@@ -2294,6 +2413,202 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun isDriveRoot(path: String): Boolean {
+        return path.matches(Regex("^[a-zA-Z]:[\\\\/]?$"))
+    }
+
+    private fun getParentWindowsPath(path: String): String? {
+        val clean = path.trimEnd('\\', '/')
+        if (clean.matches(Regex("^[a-zA-Z]:$"))) return null
+        val lastSlash = Math.max(clean.lastIndexOf('\\'), clean.lastIndexOf('/'))
+        if (lastSlash <= 0) return null
+        val parent = clean.substring(0, lastSlash)
+        return if (parent.matches(Regex("^[a-zA-Z]:$"))) "$parent\\" else parent
+    }
+
+    private fun buildFileDownloadUrl(filePath: String): String {
+        val encodedPath = URLEncoder.encode(filePath, "UTF-8").replace("+", "%20")
+        val encodedToken = URLEncoder.encode(PcApiClient.authToken, "UTF-8").replace("+", "%20")
+        val tokenQuery = if (encodedToken.isNotEmpty()) "&token=$encodedToken" else ""
+        return "${PcApiClient.baseUrl.trimEnd('/')}/download?path=$encodedPath$tokenQuery"
+    }
+
+    private fun openFileDownloadConnection(
+        filePath: String,
+        connectTimeoutMs: Int = 12_000,
+        readTimeoutMs: Int = 0
+    ): HttpURLConnection {
+        return (URL(buildFileDownloadUrl(filePath)).openConnection() as HttpURLConnection).apply {
+            requestMethod = "GET"
+            instanceFollowRedirects = true
+            connectTimeout = connectTimeoutMs
+            readTimeout = readTimeoutMs
+            setRequestProperty("User-Agent", "PC-Master-Android-App/2.0")
+            setRequestProperty("Accept", "*/*")
+            if (PcApiClient.authToken.isNotEmpty()) {
+                setRequestProperty("Authorization", "Bearer ${PcApiClient.authToken}")
+                setRequestProperty("X-Auth-Token", PcApiClient.authToken)
+            }
+        }
+    }
+
+    private fun safeFileName(fileName: String): String {
+        return fileName.substringAfterLast('\\').substringAfterLast('/').ifBlank {
+            "PCMaster_${System.currentTimeMillis()}"
+        }
+    }
+
+    private fun fileMimeType(fileName: String): String {
+        val extension = fileName.substringAfterLast('.', "").lowercase(Locale.ROOT)
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
+            ?: "application/octet-stream"
+    }
+
+    private fun formatFileSize(bytes: Long): String {
+        if (bytes <= 0) return "0 B"
+        val units = arrayOf("B", "KB", "MB", "GB", "TB")
+        val digitGroups = (Math.log10(bytes.toDouble()) / Math.log10(1024.0)).toInt().coerceIn(0, units.size - 1)
+        return "%.1f %s".format(Locale.US, bytes / Math.pow(1024.0, digitGroups.toDouble()), units[digitGroups])
+    }
+
+    private fun getMediaCacheDir(): File {
+        val dir = File(cacheDir, "pclink_media")
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    private fun getMediaCacheFile(filePath: String, fileName: String): File {
+        val cleanName = safeFileName(fileName)
+        val ext = cleanName.substringAfterLast('.', "").lowercase(Locale.ROOT)
+        val suffix = if (ext.isNotEmpty()) ".$ext" else ".bin"
+        val hash = (filePath.hashCode().toLong() and 0xFFFFFFFFL).toString(16)
+        val safeBase = cleanName.substringBeforeLast('.').replace(Regex("[^a-zA-Z0-9_-]"), "_").take(24)
+        return File(getMediaCacheDir(), "cache_${hash}_${safeBase}$suffix")
+    }
+
+    private fun fetchAndCacheMedia(
+        filePath: String,
+        fileName: String,
+        onProgress: (downloadedBytes: Long, totalBytes: Long, percent: Int) -> Unit,
+        onSuccess: (cachedFile: File) -> Unit,
+        onError: (errorMsg: String) -> Unit
+    ): Thread {
+        val thread = Thread {
+            val cacheFile = getMediaCacheFile(filePath, fileName)
+            if (cacheFile.exists() && cacheFile.length() > 0) {
+                runOnUiThread {
+                    onProgress(cacheFile.length(), cacheFile.length(), 100)
+                    onSuccess(cacheFile)
+                }
+                return@Thread
+            }
+
+            var conn: HttpURLConnection? = null
+            val tempFile = File(getMediaCacheDir(), "dl_${System.currentTimeMillis()}_${safeFileName(fileName)}.part")
+            try {
+                conn = openFileDownloadConnection(filePath, connectTimeoutMs = 12_000, readTimeoutMs = 0)
+                val code = conn.responseCode
+                if (code !in 200..299) {
+                    throw IllegalStateException("Server returned HTTP $code")
+                }
+                val totalLength = conn.contentLengthLong
+                var bytesCopied = 0L
+
+                conn.inputStream.use { input ->
+                    FileOutputStream(tempFile).use { output ->
+                        val buffer = ByteArray(65536)
+                        var read: Int
+                        var lastProgressUpdate = 0L
+                        while (input.read(buffer).also { read = it } != -1) {
+                            output.write(buffer, 0, read)
+                            bytesCopied += read
+                            val now = System.currentTimeMillis()
+                            if (now - lastProgressUpdate > 250 || (totalLength > 0 && bytesCopied == totalLength)) {
+                                lastProgressUpdate = now
+                                val percent = if (totalLength > 0) ((bytesCopied * 100) / totalLength).toInt().coerceIn(0, 100) else -1
+                                runOnUiThread { onProgress(bytesCopied, totalLength, percent) }
+                            }
+                        }
+                        output.flush()
+                    }
+                }
+
+                if (tempFile.length() == 0L) {
+                    tempFile.delete()
+                    throw IllegalStateException("Downloaded file is empty")
+                }
+
+                if (cacheFile.exists()) cacheFile.delete()
+                if (!tempFile.renameTo(cacheFile)) {
+                    tempFile.copyTo(cacheFile, overwrite = true)
+                    tempFile.delete()
+                }
+
+                runOnUiThread {
+                    onProgress(cacheFile.length(), cacheFile.length(), 100)
+                    onSuccess(cacheFile)
+                }
+            } catch (e: Exception) {
+                tempFile.delete()
+                Log.e("MainActivity", "Error fetching/caching media: ${e.message}", e)
+                runOnUiThread { onError(e.message ?: "Failed to load file from PC") }
+            } finally {
+                conn?.disconnect()
+            }
+        }
+        thread.start()
+        return thread
+    }
+
+    private fun saveStreamToDownloads(inputStream: java.io.InputStream, fileName: String, mimeType: String): Boolean {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                    put(MediaStore.Downloads.MIME_TYPE, mimeType)
+                    put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/PCMaster")
+                    put(MediaStore.Downloads.IS_PENDING, 1)
+                }
+                val resolver = contentResolver
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues) ?: return false
+                resolver.openOutputStream(uri)?.use { out ->
+                    inputStream.use { inStream ->
+                        inStream.copyTo(out)
+                    }
+                }
+                contentValues.clear()
+                contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
+                true
+            } else {
+                val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "PCMaster")
+                if (!downloadsDir.exists()) downloadsDir.mkdirs()
+                val targetFile = File(downloadsDir, fileName)
+                FileOutputStream(targetFile).use { out ->
+                    inputStream.use { inStream ->
+                        inStream.copyTo(out)
+                    }
+                }
+                MediaScannerConnection.scanFile(this, arrayOf(targetFile.absolutePath), arrayOf(mimeType), null)
+                true
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "saveStreamToDownloads error: ${e.message}", e)
+            false
+        }
+    }
+
+    private fun saveLocalFileToDownloads(file: File, fileName: String): Boolean {
+        return try {
+            java.io.FileInputStream(file).use { inStream ->
+                saveStreamToDownloads(inStream, fileName, fileMimeType(fileName))
+            }
+        } catch (e: Exception) {
+            Log.e("MainActivity", "saveLocalFileToDownloads error: ${e.message}", e)
+            false
+        }
+    }
+
     private fun showPhotoPreviewDialog(item: FileItem) {
         val dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.setContentView(R.layout.dialog_photo_preview)
@@ -2306,63 +2621,81 @@ class MainActivity : AppCompatActivity() {
         val btnDownload = dialog.findViewById<Button>(R.id.btnDownloadPhoto)
 
         tvTitle.text = item.name
-        tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Remote PC Photo" else "Remote PC Photo"
+        tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Initializing..." else "Initializing..."
         btnClose.setOnClickListener { dialog.dismiss() }
 
-        var loadedBitmap: Bitmap? = null
+        var cachedFile: File? = null
 
         btnDownload.setOnClickListener {
-            val bmp = loadedBitmap
-            if (bmp != null && !bmp.isRecycled) {
-                saveBitmapToPhoneGallery(bmp)
+            val file = cachedFile
+            if (file != null && file.exists() && file.length() > 0) {
+                Thread {
+                    val saved = saveLocalFileToDownloads(file, safeFileName(item.name))
+                    runOnUiThread {
+                        if (saved) showToast("✅ Saved to Downloads/PCMaster") else showToast("Failed to save photo")
+                    }
+                }.start()
             } else {
                 downloadFile(item.path, item.name)
             }
         }
 
-        Thread {
-            try {
-                val encodedPath = URLEncoder.encode(item.path, "UTF-8").replace("+", "%20")
-                val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
-                val urlStr = "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam"
-                val url = URL(urlStr)
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "GET"
-                conn.connectTimeout = 8000
-                conn.readTimeout = 20000
-                conn.setRequestProperty("User-Agent", "PC-Master-Android-App/2.0")
-                if (PcApiClient.authToken.isNotEmpty()) {
-                    conn.setRequestProperty("Authorization", "Bearer ${PcApiClient.authToken}")
-                    conn.setRequestProperty("X-Auth-Token", PcApiClient.authToken)
+        pbLoading.visibility = View.VISIBLE
+        fetchAndCacheMedia(
+            filePath = item.path,
+            fileName = item.name,
+            onProgress = { downloadedBytes, totalBytes, percent ->
+                if (dialog.isShowing) {
+                    tvSize.text = if (percent >= 0) "Buffering: $percent% (${formatFileSize(downloadedBytes)} / ${formatFileSize(totalBytes)})"
+                                  else "Buffering: ${formatFileSize(downloadedBytes)}"
                 }
-
-                if (conn.responseCode in 200..299) {
-                    val bmp = BitmapFactory.decodeStream(conn.inputStream)
-                    loadedBitmap = bmp
-                    runOnUiThread {
-                        pbLoading.visibility = View.GONE
+            },
+            onSuccess = { file ->
+                if (dialog.isShowing) {
+                    cachedFile = file
+                    pbLoading.visibility = View.GONE
+                    tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Loaded from PC" else "Loaded from PC"
+                    try {
+                        val boundsOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                        BitmapFactory.decodeFile(file.absolutePath, boundsOptions)
+                        var sampleSize = 1
+                        val maxDim = 3840
+                        if (boundsOptions.outWidth > maxDim || boundsOptions.outHeight > maxDim) {
+                            val halfWidth = boundsOptions.outWidth / 2
+                            val halfHeight = boundsOptions.outHeight / 2
+                            while (halfWidth / sampleSize >= maxDim && halfHeight / sampleSize >= maxDim) {
+                                sampleSize *= 2
+                            }
+                        }
+                        val decodeOptions = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+                        val bmp = BitmapFactory.decodeFile(file.absolutePath, decodeOptions)
                         if (bmp != null) {
                             ivPhoto.setImageBitmap(bmp)
                         } else {
-                            showToast("Could not decode image preview")
+                            showToast("Could not render image format")
                         }
-                    }
-                } else {
-                    runOnUiThread {
-                        pbLoading.visibility = View.GONE
-                        showToast("Server HTTP ${conn.responseCode}")
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Error decoding photo: ${e.message}", e)
+                        showToast("Image decode error: ${e.message}")
                     }
                 }
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Error loading photo preview: ${e.message}")
-                runOnUiThread {
+            },
+            onError = { errorMsg ->
+                if (dialog.isShowing) {
                     pbLoading.visibility = View.GONE
-                    showToast("Preview error: ${e.message}")
+                    tvSize.text = "Error: $errorMsg"
+                    showToast("Preview error: $errorMsg")
                 }
             }
-        }.start()
+        )
 
         dialog.show()
+    }
+
+    private fun buildStreamingUrl(filePath: String): String {
+        val encodedPath = URLEncoder.encode(filePath, "UTF-8").replace("+", "%20")
+        val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
+        return "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam"
     }
 
     private fun showVideoPreviewDialog(item: FileItem) {
@@ -2377,7 +2710,7 @@ class MainActivity : AppCompatActivity() {
         val btnDownload = dialog.findViewById<Button>(R.id.btnDownloadVideo)
 
         tvTitle.text = item.name
-        tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Live Streaming" else "Live Streaming"
+        tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Streaming..." else "Streaming..."
 
         btnClose.setOnClickListener {
             try { vvVideo.stopPlayback() } catch (_: Exception) {}
@@ -2388,51 +2721,39 @@ class MainActivity : AppCompatActivity() {
             downloadFile(item.path, item.name)
         }
 
-        val encodedPath = URLEncoder.encode(item.path, "UTF-8").replace("+", "%20")
-        val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
-        val videoUrl = "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam"
-
         val mediaController = MediaController(this)
         mediaController.setAnchorView(vvVideo)
         vvVideo.setMediaController(mediaController)
-
-        val headers = HashMap<String, String>()
-        headers["User-Agent"] = "PC-Master-Android-App/2.0"
-        if (PcApiClient.authToken.isNotEmpty()) {
-            headers["Authorization"] = "Bearer ${PcApiClient.authToken}"
-            headers["X-Auth-Token"] = PcApiClient.authToken
-        }
-
         pbBuffering.visibility = View.VISIBLE
-        vvVideo.setVideoURI(videoUrl.toUri(), headers)
 
         vvVideo.setOnPreparedListener { mp ->
             pbBuffering.visibility = View.GONE
+            tvSize.text = if (item.size.isNotEmpty()) "${item.size} • Playing" else "Playing"
             mp.start()
         }
 
         vvVideo.setOnInfoListener { _, what, _ ->
-            if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
-                pbBuffering.visibility = View.VISIBLE
-            } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
-                pbBuffering.visibility = View.GONE
-            }
+            if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) pbBuffering.visibility = View.VISIBLE
+            else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) pbBuffering.visibility = View.GONE
             false
         }
 
         vvVideo.setOnErrorListener { _, _, _ ->
             pbBuffering.visibility = View.GONE
-            showToast("Video format playback error. Tap Download to view locally.")
+            showToast("Video format not supported for streaming. Tap Download to save and play locally.")
             true
         }
 
         dialog.setOnDismissListener {
-            try {
-                vvVideo.stopPlayback()
-            } catch (_: Exception) {}
+            try { vvVideo.stopPlayback() } catch (_: Exception) {}
         }
 
         dialog.show()
+
+        // Use streaming URL with token as query parameter
+        val streamingUrl = buildStreamingUrl(item.path)
+        vvVideo.setVideoURI(streamingUrl.toUri())
+        vvVideo.requestFocus()
     }
 
     @SuppressLint("SetTextI18n")
@@ -2472,10 +2793,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         title.text = item.name
-        status.text = if (item.size.isNotEmpty()) "${item.size} - Streaming from PC" else "Streaming from PC"
+        status.text = if (item.size.isNotEmpty()) "${item.size} • Streaming..." else "Streaming..."
         close.setOnClickListener { dialog.dismiss() }
-        download.setOnClickListener { downloadFile(item.path, item.name) }
         playPause.isEnabled = false
+
+        download.setOnClickListener {
+            downloadFile(item.path, item.name)
+        }
+
         playPause.setOnClickListener {
             val currentPlayer = player ?: return@setOnClickListener
             if (currentPlayer.isPlaying) {
@@ -2492,108 +2817,34 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
                 if (fromUser) elapsed.text = formatDuration(value)
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                isSeeking = true
-            }
-
+            override fun onStartTrackingTouch(seekBar: SeekBar) { isSeeking = true }
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 player?.seekTo(seekBar.progress)
                 isSeeking = false
             }
         })
 
-        val encodedPath = URLEncoder.encode(item.path, "UTF-8").replace("+", "%20")
-        val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
-        val audioUri = "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam".toUri()
-        val headers = HashMap<String, String>()
-        headers["User-Agent"] = "PC-Master-Android-App/2.0"
-        if (PcApiClient.authToken.isNotEmpty()) {
-            headers["Authorization"] = "Bearer ${PcApiClient.authToken}"
-            headers["X-Auth-Token"] = PcApiClient.authToken
-        }
-
-        try {
-            player = MediaPlayer().apply {
-                setOnPreparedListener { preparedPlayer ->
-                    progress.max = preparedPlayer.duration
-                    duration.text = formatDuration(preparedPlayer.duration)
-                    playPause.isEnabled = true
-                    preparedPlayer.start()
-                    playPause.text = "PAUSE"
-                    updateHandler.post(updateProgress)
-                }
-                setOnCompletionListener {
-                    playPause.text = "PLAY"
-                    progress.progress = progress.max
-                    elapsed.text = duration.text
-                    updateHandler.removeCallbacks(updateProgress)
-                }
-                setOnErrorListener { _, _, _ ->
-                    status.text = "This format cannot stream on this device. Download it to play locally."
-                    playPause.isEnabled = false
-                    true
-                }
+        player = MediaPlayer().apply {
+            setOnPreparedListener { preparedPlayer ->
+                progress.max = preparedPlayer.duration
+                duration.text = formatDuration(preparedPlayer.duration)
+                playPause.isEnabled = true
+                preparedPlayer.start()
+                playPause.text = "PAUSE"
+                updateHandler.post(updateProgress)
+                status.text = if (item.size.isNotEmpty()) "${item.size} • Playing" else "Playing"
             }
-            
-            // Background thread to download the audio file locally to avoid MediaHTTPConnection timeout & Range header issues
-            status.text = "Buffering from PC..."
-            Thread {
-                var conn: HttpURLConnection? = null
-                var tempFile: File?
-                try {
-                    val url = URL(audioUri.toString())
-                    conn = url.openConnection() as HttpURLConnection
-                    conn.requestMethod = "GET"
-                    conn.connectTimeout = 5000
-                    conn.readTimeout = 0 // Stream until done
-                    conn.setRequestProperty("User-Agent", "PC-Master-Android-App/2.0")
-                    if (PcApiClient.authToken.isNotEmpty()) {
-                        conn.setRequestProperty("Authorization", "Bearer ${PcApiClient.authToken}")
-                        conn.setRequestProperty("X-Auth-Token", PcApiClient.authToken)
-                    }
-                    
-                    if (conn.responseCode == 200 || conn.responseCode == 206) {
-                        tempFile = File(cacheDir, "stream_cache_${System.currentTimeMillis()}.tmp")
-                        conn.inputStream.use { input ->
-                            FileOutputStream(tempFile).use { output ->
-                                val buffer = ByteArray(8192)
-                                var read: Int
-                                while (input.read(buffer).also { read = it } != -1) {
-                                    output.write(buffer, 0, read)
-                                }
-                                output.flush()
-                            }
-                        }
-                        
-                        runOnUiThread {
-                            if (player != null) {
-                                try {
-                                    // Use file path instead of URI to avoid MediaHTTPConnection
-                                    player?.setDataSource(tempFile.absolutePath)
-                                    status.text = if (item.size.isNotEmpty()) "${item.size} - Playing from cache" else "Playing from cache"
-                                    player?.prepareAsync()
-                                } catch (_: Exception) {
-                                    status.text = "Error starting playback."
-                                }
-                            }
-                        }
-                    } else {
-                        runOnUiThread { status.text = "Stream failed: HTTP ${conn.responseCode}" }
-                    }
-                } catch (e: Exception) {
-                    runOnUiThread { 
-                        status.text = "Could not start audio stream. Download it to play locally." 
-                        Log.e("MainActivity", "Error downloading audio stream", e)
-                    }
-                } finally {
-                    conn?.disconnect()
-                }
-            }.start()
-
-        } catch (exception: Exception) {
-            status.text = "Could not start audio stream. Download it to play locally."
-            Log.e("MainActivity", "Error starting audio stream", exception)
+            setOnCompletionListener {
+                playPause.text = "PLAY"
+                progress.progress = progress.max
+                elapsed.text = duration.text
+                updateHandler.removeCallbacks(updateProgress)
+            }
+            setOnErrorListener { _, _, _ ->
+                status.text = "Streaming failed. Tap Download to save and play locally."
+                playPause.isEnabled = false
+                true
+            }
         }
 
         dialog.setOnDismissListener {
@@ -2602,26 +2853,114 @@ class MainActivity : AppCompatActivity() {
             player = null
         }
         dialog.show()
+
+        // Use streaming URL with token as query parameter
+        val streamingUrl = buildStreamingUrl(item.path)
+        try {
+            player?.setDataSource(streamingUrl)
+            player?.prepareAsync()
+        } catch (e: Exception) {
+            status.text = "Error: ${e.message}"
+            Log.e("MainActivity", "Audio streaming error", e)
+        }
     }
 
     private fun downloadFile(filePath: String, fileName: String) {
-        val encodedPath = URLEncoder.encode(filePath, "UTF-8").replace("+", "%20")
-        val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
-        val downloadUrl = "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam"
-        val request = DownloadManager.Request(downloadUrl.toUri()).apply {
-            setTitle(fileName)
-            setDescription("Downloading $fileName from PCLink Hub")
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-            addRequestHeader("User-Agent", "PC-Master-Android-App/2.0")
-            if (PcApiClient.authToken.isNotEmpty()) {
-                addRequestHeader("Authorization", "Bearer ${PcApiClient.authToken}")
-                addRequestHeader("X-Auth-Token", PcApiClient.authToken)
+        showToast("Downloading $fileName...")
+        Thread {
+            try {
+                val encodedPath = URLEncoder.encode(filePath, "UTF-8").replace("+", "%20")
+                val tokenParam = if (PcApiClient.authToken.isNotEmpty()) "&token=${PcApiClient.authToken}" else ""
+                val downloadUrl = "${PcApiClient.baseUrl}/download?path=$encodedPath$tokenParam"
+                
+                val conn = URL(downloadUrl).openConnection() as HttpURLConnection
+                conn.requestMethod = "GET"
+                conn.connectTimeout = 15000
+                conn.readTimeout = 0
+                conn.instanceFollowRedirects = true
+                conn.setRequestProperty("User-Agent", "PC-Master-Android-App/2.0")
+                if (PcApiClient.authToken.isNotEmpty()) {
+                    conn.setRequestProperty("Authorization", "Bearer ${PcApiClient.authToken}")
+                    conn.setRequestProperty("X-Auth-Token", PcApiClient.authToken)
+                }
+                
+                val responseCode = conn.responseCode
+                if (responseCode !in 200..299) {
+                    runOnUiThread { showToast("Download failed: HTTP $responseCode") }
+                    conn.disconnect()
+                    return@Thread
+                }
+                
+                val totalLength = conn.contentLengthLong
+                val inputStream = conn.inputStream
+                val safeName = safeFileName(fileName)
+                
+                val success = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    saveStreamToMediaStore(inputStream, safeName, totalLength)
+                } else {
+                    saveStreamToDownloadsLegacy(inputStream, safeName, totalLength)
+                }
+                
+                conn.disconnect()
+                runOnUiThread {
+                    if (success) showToast("✅ Saved to Downloads/PCMaster: $safeName") else showToast("Failed to save file")
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Download error: ${e.message}", e)
+                runOnUiThread { showToast("Download error: ${e.message}") }
             }
+        }.start()
+    }
+    
+    private fun saveStreamToMediaStore(inputStream: java.io.InputStream, fileName: String, totalLength: Long): Boolean {
+        return try {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, fileMimeType(fileName))
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/PCMaster")
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+            val resolver = contentResolver
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues) ?: return false
+            resolver.openOutputStream(uri)?.use { out ->
+                val buffer = ByteArray(65536)
+                var read: Int
+                var downloaded = 0L
+                while (inputStream.read(buffer).also { read = it } != -1) {
+                    out.write(buffer, 0, read)
+                    downloaded += read
+                }
+                out.flush()
+            }
+            contentValues.clear()
+            contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+            resolver.update(uri, contentValues, null, null)
+            true
+        } catch (e: Exception) {
+            Log.e("MainActivity", "saveStreamToMediaStore error: ${e.message}", e)
+            false
         }
-        val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        dm.enqueue(request)
-        showToast("Download started: $fileName")
+    }
+    
+    private fun saveStreamToDownloadsLegacy(inputStream: java.io.InputStream, fileName: String, totalLength: Long): Boolean {
+        return try {
+            val downloadsDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "PCMaster")
+            if (!downloadsDir.exists()) downloadsDir.mkdirs()
+            val targetFile = File(downloadsDir, fileName)
+            FileOutputStream(targetFile).use { out ->
+                val buffer = ByteArray(65536)
+                var read: Int
+                while (inputStream.read(buffer).also { read = it } != -1) {
+                    out.write(buffer, 0, read)
+                }
+                out.flush()
+            }
+            MediaScannerConnection.scanFile(this, arrayOf(targetFile.absolutePath), arrayOf(fileMimeType(fileName)), null)
+            true
+        } catch (e: Exception) {
+            Log.e("MainActivity", "saveStreamToDownloadsLegacy error: ${e.message}", e)
+            false
+        }
     }
 
     private fun getFileNameFromUri(uri: Uri): String {
@@ -3447,10 +3786,6 @@ class MainActivity : AppCompatActivity() {
         activeFullscreenDialog?.dismiss()
         activeFullscreenDialog = null
         
-        try {
-            unregisterReceiver(ringBroadcastReceiver)
-        } catch (_: Exception) {}
-
         mainHandler.removeCallbacksAndMessages(null)
         liveStreamHandler.removeCallbacksAndMessages(null)
     }
