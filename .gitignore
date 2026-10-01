@@ -20,17 +20,14 @@ publish/
 publish*/
 uotut8/
 
-# Android Build
-android-app/.gradle/
-android-app/build/
-android-app/*/build/
-android-app/local.properties
-android-app/.cxx/
+# Android Projects, Builds & APKs (Private/Paid)
+android-app/
+mobile-android/
 *.apk
-!app-debug.apk
-
-mobile-android/app/build/
-mobile-android/.gradle/
+*.aab
+1_BUILD_ANDROID_APK.bat
+2_INSTALL_TO_PHONE.bat
+3_CLEAN_BUILD_AND_INSTALL.bat
 
 # Installer outputs & large archives
 PcClientSetup.exe
