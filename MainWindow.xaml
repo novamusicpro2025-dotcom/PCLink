@@ -69,6 +69,155 @@
 
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
+        <!-- ============================================== -->
+        <!-- CYBER-GLASS ULTRA-SLIM SCROLLBAR THEME        -->
+        <!-- ============================================== -->
+        <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border x:Name="thumbBorder"
+                                Background="#2A3D5B"
+                                CornerRadius="3"
+                                SnapsToDevicePixels="True"
+                                Margin="1,0"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="{StaticResource AccentBlue}"/>
+                                <Setter TargetName="thumbBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect BlurRadius="8" Color="#00D2FF" ShadowDepth="0" Opacity="0.6"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="true">
+                                <Setter TargetName="thumbBorder" Property="Background" Value="{StaticResource AccentPurple}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Width" Value="6"/>
+                    <Setter Property="MinWidth" Value="6"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid Background="Transparent" SnapsToDevicePixels="true">
+                                    <Track x:Name="PART_Track" IsDirectionReversed="true" Margin="0,4">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.LineUpCommand}" Opacity="0" Focusable="false"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                        </Track.Thumb>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.LineDownCommand}" Opacity="0" Focusable="false"/>
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Height" Value="6"/>
+                    <Setter Property="MinHeight" Value="6"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid Background="Transparent" SnapsToDevicePixels="true">
+                                    <Track x:Name="PART_Track" IsDirectionReversed="false" Margin="4,0">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.LineLeftCommand}" Opacity="0" Focusable="false"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{StaticResource ScrollBarThumb}"/>
+                                        </Track.Thumb>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.LineRightCommand}" Opacity="0" Focusable="false"/>
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Window Caption Button (Minimize / Maximize / Compact) -->
+        <Style x:Key="CaptionBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="8" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#182A45"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentBlue}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#20385C"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Window Caption Close Button -->
+        <Style x:Key="CaptionCloseBtnStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextDim}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="36"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="8" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#E81123"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="#B80010"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Cockpit Sidebar Button Style -->
         <Style x:Key="SidebarBtn" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -540,7 +689,7 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Right: IP:Port Pill with 1-Click Copy -->
+                                    <!-- Right: IP:Port Pill with 1-Click Copy & QR Code -->
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                                         <Border CornerRadius="12" Background="#1800D2FF" BorderBrush="#3300D2FF" BorderThickness="1" Padding="12,5" Margin="0,0,8,0">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -548,7 +697,8 @@
                                                 <TextBlock x:Name="LocalIpText" Text="127.0.0.1:8099" Foreground="{StaticResource AccentBlue}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Border>
-                                        <Button Content="&#x1F4CB; COPY" Click="CopyIpPort_Click" Style="{StaticResource NeonBtn}" Padding="11,5" FontSize="10" FontWeight="Black" Height="30" BorderBrush="{StaticResource AccentBlue}"/>
+                                        <Button Content="&#x1F4CB; COPY" Click="CopyIpPort_Click" ToolTip="Copy IP:Port to clipboard" Style="{StaticResource NeonBtn}" Padding="11,5" FontSize="10" FontWeight="Black" Height="30" BorderBrush="{StaticResource AccentBlue}"/>
+                                        <Button Content="&#x1F4F1; QR" Click="ShowPairingQR_Click" ToolTip="Display phone pairing QR code" Style="{StaticResource NeonBtn}" Padding="9,5" Margin="6,0,0,0" FontSize="10" FontWeight="Black" Height="30" BorderBrush="{StaticResource AccentPurple}"/>
                                         <Button Content="&#x21BB; REFRESH" Click="RefreshNetwork_Click" ToolTip="Refresh available connection addresses" Style="{StaticResource NeonBtn}" Padding="9,5" Margin="6,0,0,0" FontSize="10" FontWeight="Black" Height="30"/>
                                     </StackPanel>
                                 </Grid>
@@ -1671,9 +1821,9 @@
 
                         <!-- Mini Controls -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button Content="&#x1F5D6;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentBlue}" BorderThickness="0" Width="32" Height="26" Click="CompactModeBtn_Click" ToolTip="Expand to Full UI" Cursor="Hand"/>
-                            <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="30" Height="26" Click="MinimizeButton_Click" ToolTip="Minimize" Cursor="Hand"/>
-                            <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentRed}" BorderThickness="0" Width="30" Height="26" Click="CloseButton_Click" ToolTip="Close" Cursor="Hand"/>
+                            <Button Content="&#xE740;" Style="{StaticResource CaptionBtnStyle}" Width="30" Height="26" Click="CompactModeBtn_Click" ToolTip="Expand to Full UI"/>
+                            <Button Content="&#xE921;" Style="{StaticResource CaptionBtnStyle}" Width="30" Height="26" Click="MinimizeButton_Click" ToolTip="Minimize"/>
+                            <Button Content="&#xE8BB;" Style="{StaticResource CaptionCloseBtnStyle}" Width="30" Height="26" Click="CloseButton_Click" ToolTip="Close to Tray"/>
                         </StackPanel>
                     </Grid>
 
@@ -1866,11 +2016,11 @@
             </Border>
 
             <!-- Title Bar Buttons (Standard Mode) -->
-            <StackPanel x:Name="FullTitleBarButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,12,0">
-                <Button x:Name="CompactModeBtn" Content="&#xE740;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="CompactModeBtn_Click" ToolTip="Switch to Mini Mode (Compact Widget)" Cursor="Hand"/>
-                <Button Content="&#xE921;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="MinimizeButton_Click" ToolTip="Minimize" Cursor="Hand"/>
-                <Button Content="&#x1F5D6;" Background="Transparent" Foreground="{StaticResource TextDim}" BorderThickness="0" Width="36" Height="28" Click="MaximizeButton_Click" ToolTip="Maximize / Restore" Cursor="Hand"/>
-                <Button Content="&#xE8BB;" FontFamily="Segoe MDL2 Assets" Background="Transparent" Foreground="{StaticResource AccentRed}" BorderThickness="0" Width="36" Height="28" Click="CloseButton_Click" ToolTip="Close" Cursor="Hand"/>
+            <StackPanel x:Name="FullTitleBarButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,14,0">
+                <Button x:Name="CompactModeBtn" Content="&#xE740;" Style="{StaticResource CaptionBtnStyle}" Click="CompactModeBtn_Click" ToolTip="Switch to Mini Mode (Compact Widget)"/>
+                <Button Content="&#xE921;" Style="{StaticResource CaptionBtnStyle}" Click="MinimizeButton_Click" ToolTip="Minimize"/>
+                <Button x:Name="FullMaximizeBtn" Content="&#xE922;" Style="{StaticResource CaptionBtnStyle}" Click="MaximizeButton_Click" ToolTip="Maximize / Restore"/>
+                <Button Content="&#xE8BB;" Style="{StaticResource CaptionCloseBtnStyle}" Click="CloseButton_Click" ToolTip="Close to Tray (Keeps Phone Connected)"/>
             </StackPanel>
         </Grid>
     </Border>

@@ -6,7 +6,9 @@ echo   ?? Launching PC Master Windows Client (Admin Mode)...
 echo ========================================================
 cd /d "D:\pcmaster\pc-client_rebuild_20260506141355"
 
-set "EXE=publish_output_v8\PcClient.exe"
+set "EXE=publish\PcClient.exe"
+if not exist "%EXE%" set "EXE=publish_single\PcClient.exe"
+if not exist "%EXE%" set "EXE=publish_output_v8\PcClient.exe"
 if not exist "%EXE%" set "EXE=publish_output_v7\PcClient.exe"
 if not exist "%EXE%" set "EXE=publish_output_v6\PcClient.exe"
 if not exist "%EXE%" set "EXE=publish_output_v5\PcClient.exe"

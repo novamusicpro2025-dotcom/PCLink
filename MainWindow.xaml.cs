@@ -324,6 +324,8 @@ public partial class MainWindow : Window
 
 	private bool _isMirrorLandscape;
 
+	private bool _isExiting;
+
 	private string LogFilePath
 	{
 		get
@@ -696,7 +698,7 @@ private bool ValidateAuth(HttpListenerRequest req)
 					try
 					{
 						TcpClient client = await _tcpBridge.AcceptTcpClientAsync(token);
-						Task.Run(() => BridgeConnection(client, internalPort, token), token);
+						_ = Task.Run(() => BridgeConnection(client, internalPort, token), token);
 					}
 					catch (OperationCanceledException)
 					{
@@ -820,6 +822,14 @@ private bool ValidateAuth(HttpListenerRequest req)
 					list.Add($"{unicastIPAddressInformation.Address}:{_settings.HttpPort} ({value})");
 				}
 			}
+			list.Sort((a, b) =>
+			{
+				bool aWifi = a.Contains("WiFi") || a.Contains("Hotspot") || a.Contains("USB");
+				bool bWifi = b.Contains("WiFi") || b.Contains("Hotspot") || b.Contains("USB");
+				if (aWifi && !bWifi) return -1;
+				if (!aWifi && bWifi) return 1;
+				return 0;
+			});
 			string displayIp = ((list.Count > 0) ? string.Join("  |  ", list) : $"127.0.0.1:{_settings.HttpPort} (Local)");
 			Dispatcher.Invoke(() =>
 			{
@@ -836,6 +846,37 @@ private bool ValidateAuth(HttpListenerRequest req)
 		{
 			Log("Network Detection Error: " + ex.Message);
 		}
+	}
+
+	private string GetBestLocalIpAddress()
+	{
+		try
+		{
+			var interfaces = (from ni in NetworkInterface.GetAllNetworkInterfaces()
+				where ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
+				select ni).ToList();
+
+			var sorted = interfaces.OrderByDescending(ni =>
+			{
+				string name = ni.Name.ToLower();
+				string desc = ni.Description.ToLower();
+				if (name.Contains("wi-fi") || name.Contains("wlan") || name.Contains("hotspot") || name.Contains("direct")) return 4;
+				if (desc.Contains("ndis") || name.Contains("tether") || desc.Contains("usb")) return 3;
+				if (ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet && !desc.Contains("virtual") && !desc.Contains("hyper-v") && !desc.Contains("vmware") && !desc.Contains("box") && !desc.Contains("wsl")) return 2;
+				return 1;
+			});
+
+			foreach (var ni in sorted)
+			{
+				var ip = ni.GetIPProperties().UnicastAddresses.FirstOrDefault(ua => ua.Address.AddressFamily == AddressFamily.InterNetwork);
+				if (ip != null)
+				{
+					return ip.Address.ToString();
+				}
+			}
+		}
+		catch { }
+		return "127.0.0.1";
 	}
 
 	private void SetupTrayIcon()
@@ -920,6 +961,11 @@ private bool ValidateAuth(HttpListenerRequest req)
 		toolStripMenuItem.DropDownItems.Add(value10);
 		_trayIcon.ContextMenuStrip.Items.Add(toolStripMenuItem);
 		_trayIcon.ContextMenuStrip.Items.Add(new ToolStripSeparator());
+		ToolStripMenuItem qrItem = new ToolStripMenuItem("📱 Pair Phone (QR)", null, (object? s, EventArgs e) =>
+		{
+			Dispatcher.Invoke(() => ShowPairingQR_Click(s!, new RoutedEventArgs()));
+		});
+		_trayIcon.ContextMenuStrip.Items.Add(qrItem);
 		_trayIcon.ContextMenuStrip.Items.Add("Show", null, (object? s, EventArgs e) =>
 		{
 			ShowWindow();
@@ -973,10 +1019,27 @@ private bool ValidateAuth(HttpListenerRequest req)
 	protected override void OnStateChanged(EventArgs e)
 	{
 		base.OnStateChanged(e);
-		if (WindowState == WindowState.Minimized && TrayToggle.IsChecked == true)
+		if (WindowState == WindowState.Maximized)
+		{
+			if (FullMaximizeBtn != null)
+			{
+				FullMaximizeBtn.Content = "\uE923";
+				FullMaximizeBtn.ToolTip = "Restore";
+			}
+		}
+		else if (WindowState == WindowState.Normal)
+		{
+			if (FullMaximizeBtn != null)
+			{
+				FullMaximizeBtn.Content = "\uE922";
+				FullMaximizeBtn.ToolTip = "Maximize";
+			}
+		}
+
+		if (WindowState == WindowState.Minimized && TrayToggle?.IsChecked == true)
 		{
 			Hide();
-			_trayIcon?.ShowBalloonTip(2000, "PC Client", "Running in background.", ToolTipIcon.Info);
+			_trayIcon?.ShowBalloonTip(2000, "PC Master Running in Background", "PC Master is active in your system tray. Your mobile connection is maintained.", ToolTipIcon.Info);
 		}
 	}
 
@@ -989,6 +1052,7 @@ private bool ValidateAuth(HttpListenerRequest req)
 
 	private void ExitApp()
 	{
+		_isExiting = true;
 		_timer?.Stop();
 		_clipboardTimer?.Stop();
 		_toastTimer?.Stop();
@@ -2527,14 +2591,12 @@ var value2 = new
 			}
 			if (text == "/settings")
 			{
-				string ip = (from ni in NetworkInterface.GetAllNetworkInterfaces()
-					where ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
-					select ni).SelectMany((NetworkInterface ni) => ni.GetIPProperties().UnicastAddresses).FirstOrDefault((UnicastIPAddressInformation unicastIPAddressInformation) => unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString() ?? "127.0.0.1";
+				string ip = GetBestLocalIpAddress();
 				var value4 = new
 				{
 					authToken = _settings.AuthToken,
 					requireAuth = _settings.RequireAuth,
-					version = "2.0",
+					version = "2.5",
 					compactMode = _settings.CompactMode,
 					ip = ip,
 					port = _settings.HttpPort,
@@ -2784,9 +2846,7 @@ var value2 = new
 				}
 			case "/pair/qr":
 			{
-				string value10 = (from ni in NetworkInterface.GetAllNetworkInterfaces()
-					where ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
-					select ni).SelectMany((NetworkInterface ni) => ni.GetIPProperties().UnicastAddresses).FirstOrDefault((UnicastIPAddressInformation unicastIPAddressInformation) => unicastIPAddressInformation.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString() ?? "127.0.0.1";
+				string value10 = GetBestLocalIpAddress();
 				var value11 = new
 				{
 					url = $"http://{value10}:{_settings.HttpPort}",
@@ -5090,17 +5150,19 @@ private bool IsPublicEndpoint(string path)
 		if (WindowState == WindowState.Maximized)
 		{
 			WindowState = WindowState.Normal;
-			if (sender is System.Windows.Controls.Button button)
+			if (FullMaximizeBtn != null)
 			{
-				button.Content = "\ud83d\uddd6";
+				FullMaximizeBtn.Content = "\uE922";
+				FullMaximizeBtn.ToolTip = "Maximize";
 			}
 		}
 		else
 		{
 			WindowState = WindowState.Maximized;
-			if (sender is System.Windows.Controls.Button button2)
+			if (FullMaximizeBtn != null)
 			{
-				button2.Content = "\ud83d\uddd7";
+				FullMaximizeBtn.Content = "\uE923";
+				FullMaximizeBtn.ToolTip = "Restore";
 			}
 		}
 	}
@@ -5380,21 +5442,7 @@ private bool IsPublicEndpoint(string path)
 		try
 		{
 			// Get local PC IP to determine subnet
-			string localIp = "";
-			foreach (var ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
-			{
-				if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
-				if (ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
-				foreach (var addr in ni.GetIPProperties().UnicastAddresses)
-				{
-					if (addr.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-					{
-						localIp = addr.Address.ToString();
-						break;
-					}
-				}
-				if (!string.IsNullOrEmpty(localIp)) break;
-			}
+			string localIp = GetBestLocalIpAddress();
 
 			if (string.IsNullOrEmpty(localIp)) return false;
 
@@ -5954,7 +6002,15 @@ private async Task<bool> SendReplyToPhone(string notifId, string replyText, stri
 
 	private void CloseButton_Click(object sender, RoutedEventArgs e)
 	{
-		Close();
+		if (TrayToggle?.IsChecked == true)
+		{
+			Hide();
+			_trayIcon?.ShowBalloonTip(2000, "PC Master Running in Background", "PC Master is active in your system tray. Your mobile connection is maintained.", ToolTipIcon.Info);
+		}
+		else
+		{
+			Close();
+		}
 	}
 
 	private void CompactModeBtn_Click(object sender, RoutedEventArgs e)
@@ -5980,72 +6036,142 @@ private async Task<bool> SendReplyToPhone(string notifId, string replyText, stri
 	{
 		try
 		{
-			string value = (from ni in NetworkInterface.GetAllNetworkInterfaces()
-				where ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
-				select ni).SelectMany((NetworkInterface ni) => ni.GetIPProperties().UnicastAddresses).FirstOrDefault((UnicastIPAddressInformation ip) => ip.Address.AddressFamily == AddressFamily.InterNetwork)?.Address.ToString() ?? "127.0.0.1";
+			string value = GetBestLocalIpAddress();
 			string text = $"http://{value}:{_settings.HttpPort}";
 			string stringToEscape = text + "|" + _settings.AuthToken;
 			string uriString = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + Uri.EscapeDataString(stringToEscape);
+
 			Window window = new Window
 			{
-				Title = "Pair Mobile Device",
-				Width = 400.0,
-				Height = 500.0,
+				Title = "Connect Mobile Device",
+				Width = 420.0,
+				Height = 570.0,
 				WindowStartupLocation = WindowStartupLocation.CenterOwner,
 				Owner = this,
-				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(6, 9, 18))
+				ResizeMode = ResizeMode.NoResize,
+				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(5, 10, 20))
 			};
-			StackPanel stackPanel = new StackPanel
+
+			Border rootBorder = new Border
 			{
-				Margin = new Thickness(20.0)
+				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(5, 10, 20)),
+				Padding = new Thickness(24.0)
 			};
+
+			StackPanel stackPanel = new StackPanel();
+
 			stackPanel.Children.Add(new TextBlock
 			{
-				Text = "Scan with your phone",
+				Text = "📱 Connect Mobile Device",
 				Foreground = System.Windows.Media.Brushes.White,
 				FontSize = 18.0,
 				FontWeight = FontWeights.Bold,
 				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-				Margin = new Thickness(0.0, 0.0, 0.0, 10.0)
+				Margin = new Thickness(0.0, 0.0, 0.0, 4.0)
 			});
+
+			stackPanel.Children.Add(new TextBlock
+			{
+				Text = "Open PC Master on Android and scan this QR code",
+				Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(138, 155, 181)),
+				FontSize = 11.5,
+				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+				Margin = new Thickness(0.0, 0.0, 0.0, 16.0)
+			});
+
+			Border qrCard = new Border
+			{
+				Background = System.Windows.Media.Brushes.White,
+				CornerRadius = new CornerRadius(16.0),
+				Padding = new Thickness(12.0),
+				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+				Width = 260.0,
+				Height = 260.0,
+				Effect = new System.Windows.Media.Effects.DropShadowEffect
+				{
+					BlurRadius = 24,
+					Color = System.Windows.Media.Color.FromRgb(0, 210, 255),
+					Opacity = 0.35,
+					ShadowDepth = 0
+				}
+			};
+
 			System.Windows.Controls.Image element = new System.Windows.Controls.Image
 			{
-				Source = new BitmapImage(new Uri(uriString)),
-				Width = 300.0,
-				Height = 300.0
+				Width = 236.0,
+				Height = 236.0,
+				Stretch = Stretch.Uniform
 			};
-			stackPanel.Children.Add(element);
-			stackPanel.Children.Add(new TextBlock
+
+			try
 			{
-				Text = "URL: " + text,
-				Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 210, byte.MaxValue)),
-				FontSize = 12.0,
-				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-				Margin = new Thickness(0.0, 15.0, 0.0, 5.0),
-				TextWrapping = TextWrapping.Wrap
+				BitmapImage bmp = new BitmapImage();
+				bmp.BeginInit();
+				bmp.UriSource = new Uri(uriString);
+				bmp.CacheOption = BitmapCacheOption.OnLoad;
+				bmp.EndInit();
+				element.Source = bmp;
+			}
+			catch { }
+
+			qrCard.Child = element;
+			stackPanel.Children.Add(qrCard);
+
+			Border infoCard = new Border
+			{
+				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(11, 21, 40)),
+				BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(26, 45, 74)),
+				BorderThickness = new Thickness(1.0),
+				CornerRadius = new CornerRadius(10.0),
+				Padding = new Thickness(12.0, 8.0, 12.0, 8.0),
+				Margin = new Thickness(0.0, 16.0, 0.0, 0.0)
+			};
+
+			StackPanel infoStack = new StackPanel();
+			infoStack.Children.Add(new TextBlock
+			{
+				Text = text,
+				Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 210, 255)),
+				FontSize = 13.0,
+				FontWeight = FontWeights.Bold,
+				HorizontalAlignment = System.Windows.HorizontalAlignment.Center
 			});
-			stackPanel.Children.Add(new TextBlock
+			infoStack.Children.Add(new TextBlock
 			{
-				Text = "Token: " + _settings.AuthToken,
+				Text = "Auth Token: " + _settings.AuthToken,
 				Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(106, 119, 139)),
 				FontSize = 10.0,
 				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
-				TextWrapping = TextWrapping.Wrap
+				Margin = new Thickness(0.0, 2.0, 0.0, 0.0)
 			});
+			infoCard.Child = infoStack;
+			stackPanel.Children.Add(infoCard);
+
 			System.Windows.Controls.Button copyPairingButton = new System.Windows.Controls.Button
 			{
-				Content = "COPY PAIRING INFO",
-				Margin = new Thickness(0.0, 18.0, 0.0, 0.0),
-				Padding = new Thickness(12.0, 7.0, 12.0, 7.0),
-				HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+				Content = "📋 COPY PAIRING LINK",
+				Margin = new Thickness(0.0, 14.0, 0.0, 0.0),
+				Padding = new Thickness(16.0, 8.0, 16.0, 8.0),
+				HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(16, 28, 48)),
+				Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 210, 255)),
+				BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 210, 255)),
+				BorderThickness = new Thickness(1.0),
+				FontWeight = FontWeights.Bold,
+				FontSize = 11.5,
+				Cursor = System.Windows.Input.Cursors.Hand
 			};
 			copyPairingButton.Click += (object? copySender, RoutedEventArgs copyEventArgs) =>
 			{
 				System.Windows.Clipboard.SetText(stringToEscape);
-				copyPairingButton.Content = "PAIRING INFO COPIED";
+				copyPairingButton.Content = "✓ PAIRING INFO COPIED!";
+				copyPairingButton.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 136));
+				copyPairingButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 136));
 			};
 			stackPanel.Children.Add(copyPairingButton);
-			window.Content = stackPanel;
+
+			rootBorder.Child = stackPanel;
+			window.Content = rootBorder;
 			window.ShowDialog();
 			AddToLog("Pairing QR displayed");
 		}
@@ -6153,6 +6279,18 @@ private async Task<bool> SendReplyToPhone(string notifId, string replyText, stri
 		{
 			DragMove();
 		}
+	}
+
+	protected override void OnClosing(CancelEventArgs e)
+	{
+		if (TrayToggle?.IsChecked == true && !_isExiting)
+		{
+			e.Cancel = true;
+			Hide();
+			_trayIcon?.ShowBalloonTip(2000, "PC Master Running in Background", "PC Master is active in your system tray. Your mobile connection is maintained.", ToolTipIcon.Info);
+			return;
+		}
+		base.OnClosing(e);
 	}
 
 	protected override void OnClosed(EventArgs e)
