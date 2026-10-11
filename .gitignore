@@ -42,3 +42,7 @@ login_dump.xml
 
 # Scratch files
 scratch_*.py
+test_live_frame.jpg
+blogger_pc_master_updated.html
+release_standalone/
+release_temp/

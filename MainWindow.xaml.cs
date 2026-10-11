@@ -375,6 +375,18 @@ public partial class MainWindow : Window
 	[DllImport("psapi.dll", SetLastError = true)]
 	private static extern bool EmptyWorkingSet(nint hProcess);
 
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern nint OpenInputDesktop(uint dwFlags, bool fInherit, uint dwDesiredAccess);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool SetThreadDesktop(nint hDesktop);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool CloseDesktop(nint hDesktop);
+
+	[DllImport("user32.dll")]
+	private static extern int GetSystemMetrics(int nIndex);
+
 	private void LoadSettings()
 	{
 		try
@@ -483,24 +495,47 @@ private bool ValidateAuth(HttpListenerRequest req)
             {
                 return true;
             }
+            // Security: if no token is configured, deny rather than allow-all.
+            if (string.IsNullOrEmpty(_settings.AuthToken))
+            {
+                return false;
+            }
             string authHeader = req.Headers["Authorization"];
             if (!string.IsNullOrEmpty(authHeader))
             {
-                if (authHeader.Equals("Bearer " + _settings.AuthToken, StringComparison.OrdinalIgnoreCase) ||
-                    authHeader.Equals(_settings.AuthToken, StringComparison.Ordinal))
+                if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (FixedTimeEquals(authHeader.Substring(7), _settings.AuthToken))
+                        return true;
+                }
+                else if (FixedTimeEquals(authHeader, _settings.AuthToken))
+                {
                     return true;
+                }
             }
             string tokenHeader = req.Headers["X-Auth-Token"];
-            if (!string.IsNullOrEmpty(tokenHeader) && tokenHeader == _settings.AuthToken)
+            if (!string.IsNullOrEmpty(tokenHeader) && FixedTimeEquals(tokenHeader, _settings.AuthToken))
             {
                 return true;
             }
             string tokenQuery = req.QueryString["token"];
-            if (!string.IsNullOrEmpty(tokenQuery) && tokenQuery == _settings.AuthToken)
+            if (!string.IsNullOrEmpty(tokenQuery) && FixedTimeEquals(tokenQuery, _settings.AuthToken))
             {
                 return true;
             }
             return false;
+        }
+
+        // Constant-time string comparison to mitigate token timing attacks.
+        private static bool FixedTimeEquals(string a, string b)
+        {
+            if (a == null || b == null)
+            {
+                return false;
+            }
+            byte[] bytes = Encoding.UTF8.GetBytes(a);
+            byte[] bytes2 = Encoding.UTF8.GetBytes(b);
+            return CryptographicOperations.FixedTimeEquals(bytes, bytes2);
         }
 
 	private static readonly object _logLock = new object();
@@ -1993,9 +2028,18 @@ private bool ValidateAuth(HttpListenerRequest req)
 			{
 				_lastConnectedMobileIp = text2;
 			}
-			response.Headers.Add("Access-Control-Allow-Origin", "*");
+			string origin = request.Headers["Origin"];
+			if (!string.IsNullOrWhiteSpace(origin))
+			{
+				response.Headers.Add("Access-Control-Allow-Origin", origin);
+				response.Headers.Add("Vary", "Origin");
+			}
+			else
+			{
+				response.Headers.Add("Access-Control-Allow-Origin", "*");
+			}
 			response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-			response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, User-Agent, Authorization");
+			response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, User-Agent, Authorization, X-Auth-Token");
 			if (request.HttpMethod == "OPTIONS")
 			{
 				response.StatusCode = 200;
@@ -2596,7 +2640,7 @@ var value2 = new
 				{
 					authToken = _settings.AuthToken,
 					requireAuth = _settings.RequireAuth,
-					version = "2.5",
+					version = "2.5.2",
 					compactMode = _settings.CompactMode,
 					ip = ip,
 					port = _settings.HttpPort,
@@ -2887,6 +2931,7 @@ var value2 = new
 					byte[] array3 = CaptureScreenFrame(quality, targetWidth);
 					response.ContentType = "image/jpeg";
 					response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+					response.KeepAlive = true;
 					response.ContentLength64 = array3.Length;
 					response.OutputStream.Write(array3, 0, array3.Length);
 					break;
@@ -2919,12 +2964,23 @@ var value2 = new
 				}
 			case "/screen/info":
 			{
+				int left = GetSystemMetrics(76);
+				int top = GetSystemMetrics(77);
+				int width = GetSystemMetrics(78);
+				int height = GetSystemMetrics(79);
+				if (width <= 0 || height <= 0)
+				{
+					width = GetSystemMetrics(0);
+					height = GetSystemMetrics(1);
+					left = 0;
+					top = 0;
+				}
 				var value8 = new
 				{
-					width = (int)SystemParameters.VirtualScreenWidth,
-					height = (int)SystemParameters.VirtualScreenHeight,
-					left = (int)SystemParameters.VirtualScreenLeft,
-					top = (int)SystemParameters.VirtualScreenTop
+					width = width,
+					height = height,
+					left = left,
+					top = top
 				};
 				SendString(response, JsonSerializer.Serialize(value8), "application/json");
 				break;
@@ -2944,23 +3000,6 @@ private bool IsPublicEndpoint(string path)
         {
             switch (path)
             {
-            default:
-                if (!path.StartsWith("/download/"))
-                {
-                    switch (path)
-                    {
-                    default:
-                        return path == "/notifications";
-                    case "/screenshot":
-                    case "/mirror/stream":
-                    case "/mirror/live":
-                    case "/mirror/start":
-                    case "/mirror/stop":
-                    case "/screen/info":
-                        break;
-                    }
-                }
-                break;
             case "/ping":
             case "/settings":
             case "/":
@@ -2968,78 +3007,150 @@ private bool IsPublicEndpoint(string path)
             case "/health":
             case "/battery":
             case "/wifi":
-                break;
+            case "/screenshot":
+            case "/mirror/stream":
+            case "/mirror/live":
+            case "/mirror/start":
+            case "/mirror/stop":
+            case "/screen/info":
+                return true;
+            default:
+                return false;
             }
-            return true;
         }
 
 	private byte[] CaptureScreenFrame(long quality = 75L, int targetWidth = 0)
 	{
-		int num = 0;
-		int num2 = 0;
-		int num3 = 1920;
-		int num4 = 1080;
-		try
+		int num = GetSystemMetrics(76); // SM_XVIRTUALSCREEN
+		int num2 = GetSystemMetrics(77); // SM_YVIRTUALSCREEN
+		int num3 = GetSystemMetrics(78); // SM_CXVIRTUALSCREEN
+		int num4 = GetSystemMetrics(79); // SM_CYVIRTUALSCREEN
+
+		if (num3 <= 0 || num4 <= 0)
 		{
-			num = (int)SystemParameters.VirtualScreenLeft;
-			num2 = (int)SystemParameters.VirtualScreenTop;
-			num3 = (int)SystemParameters.VirtualScreenWidth;
-			num4 = (int)SystemParameters.VirtualScreenHeight;
-		}
-		catch (Exception ex)
-		{
-			Log("CaptureScreenFrame: Failed to get screen params: " + ex.Message);
+			num3 = GetSystemMetrics(0); // SM_CXSCREEN
+			num4 = GetSystemMetrics(1); // SM_CYSCREEN
+			num = 0;
+			num2 = 0;
 		}
 		if (num3 <= 0 || num4 <= 0)
 		{
 			num3 = 1920;
 			num4 = 1080;
 		}
-		using Bitmap bitmap = new Bitmap(num3, num4);
-		using (Graphics graphics = Graphics.FromImage(bitmap))
+
+		Bitmap? bitmap = null;
+		Exception? captureEx = null;
+
+		// Attempt 1: Fast direct capture on current thread with input desktop attached
+		nint hDesk = nint.Zero;
+		try
 		{
-			bool flag = false;
-			try
+			hDesk = OpenInputDesktop(0, false, 0x01FF);
+			if (hDesk != nint.Zero)
 			{
-				graphics.CopyFromScreen(num, num2, 0, 0, bitmap.Size);
-				flag = true;
+				SetThreadDesktop(hDesk);
 			}
-			catch (Exception ex2)
+
+			Bitmap directBmp = new Bitmap(num3, num4, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			using (Graphics g = Graphics.FromImage(directBmp))
 			{
-				graphics.Clear(System.Drawing.Color.FromArgb(12, 16, 26));
-				using SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(0, 240, 255));
-				using Font font = new Font(System.Drawing.FontFamily.GenericSansSerif, 20f, System.Drawing.FontStyle.Bold);
-				using Font font2 = new Font(System.Drawing.FontFamily.GenericSansSerif, 12f);
-				graphics.DrawString("PC MASTER - SCREEN STANDBY", font, brush, 80f, num4 / 2 - 40);
-				using SolidBrush brush2 = new SolidBrush(System.Drawing.Color.Gray);
-				graphics.DrawString("Desktop is locked, asleep, or protected by Windows (" + ex2.Message + ")", font2, brush2, 80f, num4 / 2 + 10);
+				g.CopyFromScreen(num, num2, 0, 0, directBmp.Size, CopyPixelOperation.SourceCopy);
 			}
-			if (flag)
+			bitmap = directBmp;
+		}
+		catch (Exception ex1)
+		{
+			captureEx = ex1;
+		}
+		finally
+		{
+			if (hDesk != nint.Zero)
 			{
-				try
-				{
-					CURSORINFO pci = new CURSORINFO
-					{
-						cbSize = Marshal.SizeOf(typeof(CURSORINFO))
-					};
-					if (GetCursorInfo(out pci) && pci.flags == 1)
-					{
-						nint hdc = graphics.GetHdc();
-						try
-						{
-							DrawIcon(hdc, pci.ptScreenPos.x - num, pci.ptScreenPos.y - num2, pci.hCursor);
-						}
-						finally
-						{
-							graphics.ReleaseHdc(hdc);
-						}
-					}
-				}
-				catch
-				{
-				}
+				CloseDesktop(hDesk);
 			}
 		}
+
+		// Attempt 2: If current thread is busy/GUI thread, capture on clean background STA thread
+		if (bitmap == null)
+		{
+			Thread t = new Thread(() =>
+			{
+				nint cleanDesk = nint.Zero;
+				try
+				{
+					cleanDesk = OpenInputDesktop(0, false, 0x01FF);
+					if (cleanDesk != nint.Zero)
+					{
+						SetThreadDesktop(cleanDesk);
+					}
+					Bitmap threadBmp = new Bitmap(num3, num4, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+					using (Graphics g = Graphics.FromImage(threadBmp))
+					{
+						g.CopyFromScreen(num, num2, 0, 0, threadBmp.Size, CopyPixelOperation.SourceCopy);
+					}
+					bitmap = threadBmp;
+				}
+				catch (Exception ex2)
+				{
+					captureEx = ex2;
+				}
+				finally
+				{
+					if (cleanDesk != nint.Zero)
+					{
+						CloseDesktop(cleanDesk);
+					}
+				}
+			});
+			t.SetApartmentState(ApartmentState.STA);
+			t.IsBackground = true;
+			t.Start();
+			t.Join(1500);
+		}
+
+		// Fallback for when the desktop is actually locked / asleep
+		if (bitmap == null)
+		{
+			bitmap = new Bitmap(num3, num4);
+			using Graphics graphics = Graphics.FromImage(bitmap);
+			graphics.Clear(System.Drawing.Color.FromArgb(12, 16, 26));
+			using SolidBrush brush = new SolidBrush(System.Drawing.Color.FromArgb(0, 240, 255));
+			using Font font = new Font(System.Drawing.FontFamily.GenericSansSerif, 20f, System.Drawing.FontStyle.Bold);
+			using Font font2 = new Font(System.Drawing.FontFamily.GenericSansSerif, 12f);
+			graphics.DrawString("PC MASTER - SCREEN STANDBY", font, brush, 80f, num4 / 2 - 40);
+			using SolidBrush brush2 = new SolidBrush(System.Drawing.Color.Gray);
+			string msg = captureEx?.Message ?? "Desktop is locked, asleep, or protected by Windows";
+			graphics.DrawString("Desktop is locked, asleep, or protected by Windows (" + msg + ")", font2, brush2, 80f, num4 / 2 + 10);
+		}
+		else
+		{
+			// Draw cursor on captured screen
+			try
+			{
+				CURSORINFO pci = new CURSORINFO
+				{
+					cbSize = Marshal.SizeOf(typeof(CURSORINFO))
+				};
+				if (GetCursorInfo(out pci) && pci.flags == 1)
+				{
+					using Graphics gCursor = Graphics.FromImage(bitmap);
+					nint hdc = gCursor.GetHdc();
+					try
+					{
+						DrawIcon(hdc, pci.ptScreenPos.x - num, pci.ptScreenPos.y - num2, pci.hCursor);
+					}
+					finally
+					{
+						gCursor.ReleaseHdc(hdc);
+					}
+				}
+			}
+			catch
+			{
+			}
+		}
+
 		Bitmap bitmap2 = bitmap;
 		bool flag2 = false;
 		if (targetWidth > 0 && targetWidth < num3)
@@ -3051,7 +3162,7 @@ private bool IsPublicEndpoint(string path)
 		try
 		{
 			using MemoryStream memoryStream = new MemoryStream();
-			ImageCodecInfo encoder = GetEncoder(ImageFormat.Jpeg);
+			ImageCodecInfo? encoder = GetEncoder(ImageFormat.Jpeg);
 			if (encoder != null)
 			{
 				using EncoderParameters encoderParameters = new EncoderParameters(1);
@@ -3070,6 +3181,7 @@ private bool IsPublicEndpoint(string path)
 			{
 				bitmap2.Dispose();
 			}
+			bitmap.Dispose();
 		}
 	}
 
@@ -3216,19 +3328,7 @@ private bool IsPublicEndpoint(string path)
 
 	private byte[] CaptureScreenshot()
 	{
-		try
-		{
-			return CaptureScreenFrame(80L);
-		}
-		catch
-		{
-			using Bitmap bitmap = new Bitmap((int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
-			using Graphics graphics = Graphics.FromImage(bitmap);
-			graphics.CopyFromScreen((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop, 0, 0, bitmap.Size);
-			using MemoryStream memoryStream = new MemoryStream();
-			bitmap.Save(memoryStream, ImageFormat.Png);
-			return memoryStream.ToArray();
-		}
+		return CaptureScreenFrame(80L);
 	}
 
 	private void ToggleCompactMode()
@@ -3583,8 +3683,31 @@ private bool IsPublicEndpoint(string path)
 			string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mobile-app", "index.html");
 			if (File.Exists(path))
 			{
-				byte[] array = File.ReadAllBytes(path);
-				resp.ContentType = "text/html";
+				string html = File.ReadAllText(path);
+				// Security: inject the auth token into the same-origin HTML so the web UI can
+				// authenticate without exposing the token via a public /settings API call.
+				// The token is HTML/JS-escaped to prevent breaking out of the string literal.
+				if (!string.IsNullOrEmpty(_settings.AuthToken))
+				{
+					string jsSafeToken = _settings.AuthToken
+						.Replace("\\", "\\\\")
+						.Replace("\"", "\\\"")
+						.Replace("<", "\\x3c")
+						.Replace(">", "\\x3e")
+						.Replace("&", "\\x26");
+					string injection = "<script>window.__PC_AUTH_TOKEN__=\"" + jsSafeToken + "\";</script>";
+					int headIdx = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
+					if (headIdx >= 0)
+					{
+						html = html.Insert(headIdx, injection);
+					}
+					else
+					{
+						html = injection + html;
+					}
+				}
+				byte[] array = Encoding.UTF8.GetBytes(html);
+				resp.ContentType = "text/html; charset=utf-8";
 				resp.ContentLength64 = array.Length;
 				resp.OutputStream.Write(array, 0, array.Length);
 			}
@@ -3592,6 +3715,7 @@ private bool IsPublicEndpoint(string path)
 			{
 				string s = "<html><body style='background:#060912;color:white;font-family:sans-serif;text-align:center;padding:50px;'><h1>PC Master Mobile</h1><p>Please build the mobile-app folder.</p></body></html>";
 				byte[] bytes = Encoding.UTF8.GetBytes(s);
+				resp.ContentType = "text/html; charset=utf-8";
 				resp.ContentLength64 = bytes.Length;
 				resp.OutputStream.Write(bytes, 0, bytes.Length);
 			}
@@ -5797,6 +5921,10 @@ private async Task<bool> SendReplyToPhone(string notifId, string replyText, stri
                         new KeyValuePair<string, string>("id", notifId),
                         new KeyValuePair<string, string>("message", replyText)
                     });
+                    if (!string.IsNullOrEmpty(_settings?.AuthToken))
+                    {
+                        client.DefaultRequestHeaders.TryAddWithoutValidation("X-Auth-Token", _settings.AuthToken);
+                    }
                     var resp = await client.PostAsync("http://" + _lastConnectedMobileIp + ":8092/reply", content);
                     if (resp.IsSuccessStatusCode)
                     {

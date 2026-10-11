@@ -1526,7 +1526,9 @@
 
     <script>
         // State & Auth
-        let authToken = localStorage.getItem('pcMasterToken') || '';
+        // The auth token is injected same-origin by the PC hub when serving this page.
+        // Fall back to any previously cached token, then to an empty string.
+        let authToken = window.__PC_AUTH_TOKEN__ || localStorage.getItem('pcMasterToken') || '';
         let pcIp = window.location.hostname || '127.0.0.1';
         let pcPort = window.location.port || '8099';
         let isCaffeineActive = false;
@@ -1557,7 +1559,12 @@
 
         // Settings & Auth Token Fetch
         function initSettings() {
-            fetch('/settings').then(r => r.json()).then(data => {
+            // If the hub injected a token same-origin, prefer and cache it.
+            if (window.__PC_AUTH_TOKEN__) {
+                authToken = window.__PC_AUTH_TOKEN__;
+                localStorage.setItem('pcMasterToken', authToken);
+            }
+            authFetch('/settings').then(r => r.json()).then(data => {
                 if (data.authToken) {
                     authToken = data.authToken;
                     localStorage.setItem('pcMasterToken', authToken);
@@ -1625,12 +1632,15 @@
                 const lat = document.getElementById('latency-val');
                 if (lat && dt > 0) lat.innerText = `⚡ ${dt}ms`;
                 if (r.status === 401) {
-                    return fetch('/settings').then(r2 => r2.json()).then(data => {
-                        authToken = data.authToken;
+                    // Token may have rotated; use the same-origin injected token if present,
+                    // otherwise fall back to the cached token, then retry once.
+                    const refreshed = window.__PC_AUTH_TOKEN__ || localStorage.getItem('pcMasterToken') || authToken;
+                    if (refreshed && refreshed !== authToken) {
+                        authToken = refreshed;
                         localStorage.setItem('pcMasterToken', authToken);
                         options.headers['Authorization'] = 'Bearer ' + authToken;
                         return fetch(url, options);
-                    });
+                    }
                 }
                 return r;
             });
