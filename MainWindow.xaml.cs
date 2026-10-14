@@ -621,40 +621,49 @@ private bool ValidateAuth(HttpListenerRequest req)
 		}
 		try
 		{
-			_fileServer = new HttpListener();
-			List<string> list = new List<string>();
-			string value = "http";
-			list.Add($"{value}://localhost:{_settings.HttpPort}/");
-			list.Add($"{value}://127.0.0.1:{_settings.HttpPort}/");
+			bool directBindSuccess = false;
+
+			// Strategy 1: Direct wildcard binding on HttpPort using HttpListener (HTTP.SYS)
+			// If run as Administrator or if URL ACL (netsh http add urlacl) was added,
+			// wildcard (*) allows ANY IP, Host header, WiFi, hotspot, etc. with zero 400 Hostname errors.
 			try
 			{
-				foreach (NetworkInterface item in from ni in NetworkInterface.GetAllNetworkInterfaces()
-					where ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback
-					select ni)
-				{
-					foreach (UnicastIPAddressInformation unicastAddress in item.GetIPProperties().UnicastAddresses)
-					{
-						if (unicastAddress.Address.AddressFamily == AddressFamily.InterNetwork)
-						{
-							list.Add($"{value}://{unicastAddress.Address}:{_settings.HttpPort}/");
-						}
-					}
-				}
+				_fileServer = new HttpListener();
+				_fileServer.Prefixes.Add($"http://*:{_settings.HttpPort}/");
+				_fileServer.Prefixes.Add($"http://localhost:{_settings.HttpPort}/");
+				_fileServer.Prefixes.Add($"http://127.0.0.1:{_settings.HttpPort}/");
+				_fileServer.Start();
+				directBindSuccess = true;
+				AddToLog($"Wireless Hub: Active directly on port {_settings.HttpPort} (Wildcard *)");
 			}
-			catch
+			catch (Exception exDirect)
 			{
-			}
-			foreach (string item2 in list)
-			{
+				Log("Direct wildcard bind requires elevation/urlacl: " + exDirect.Message);
 				try
 				{
-					_fileServer.Prefixes.Add(item2);
+					_fileServer?.Close();
 				}
-				catch (Exception ex)
-				{
-					Log("Failed to add prefix " + item2 + ": " + ex.Message);
-				}
+				catch { }
+				_fileServer = null;
 			}
+
+			// Strategy 2: Universal WiFi Bridge
+			// Standard Winsock TcpListener(IPAddress.Any, publicPort) NEVER requires Admin on Windows!
+			// We bind TcpListener on 0.0.0.0:HttpPort (accepting all mobile connections across any network adapter),
+			// and bridge to loopback HttpListener on internalPort (127.0.0.1:internalPort).
+			if (!directBindSuccess)
+			{
+				int internalPort = _settings.HttpPort + 10;
+				AddToLog($"Activating Universal WiFi Bridge (0.0.0.0:{_settings.HttpPort} -> 127.0.0.1:{internalPort})");
+
+				_fileServer = new HttpListener();
+				_fileServer.Prefixes.Add($"http://localhost:{internalPort}/");
+				_fileServer.Prefixes.Add($"http://127.0.0.1:{internalPort}/");
+				_fileServer.Start();
+
+				StartTcpBridge(_settings.HttpPort, internalPort);
+			}
+
 			if (_settings.EnableSsl && !string.IsNullOrEmpty(_settings.SslCertPath) && File.Exists(_settings.SslCertPath))
 			{
 				try
@@ -667,28 +676,7 @@ private bool ValidateAuth(HttpListenerRequest req)
 					Log("SSL Cert load error: " + ex2.Message);
 				}
 			}
-			try
-			{
-				_fileServer.Start();
-			}
-			catch (Exception ex3)
-			{
-				AddToLog("Hub: External IP requires elevation (" + ex3.Message + "), activating Universal WiFi Bridge");
-				try
-				{
-					_fileServer.Close();
-				}
-				catch (Exception ex4)
-				{
-					Log("FileServer close error: " + ex4.Message);
-				}
-				int num = _settings.HttpPort + 10;
-				_fileServer = new HttpListener();
-				_fileServer.Prefixes.Add($"http://localhost:{num}/");
-				_fileServer.Prefixes.Add($"http://127.0.0.1:{num}/");
-				_fileServer.Start();
-				StartTcpBridge(_settings.HttpPort, num);
-			}
+
 			_serverThread = new Thread(ListenForRequests)
 			{
 				IsBackground = true,
@@ -706,7 +694,7 @@ private bool ValidateAuth(HttpListenerRequest req)
 					StartFileServerButtonMini.Content = "HUB ON";
 				}
 			});
-			AddToLog($"Wireless Hub: Active on port {_settings.HttpPort}");
+			AddToLog($"Wireless Hub: Ready for connections on port {_settings.HttpPort}");
 			UpdateNetworkInfo();
 		}
 		catch (Exception ex5)
@@ -777,7 +765,6 @@ private bool ValidateAuth(HttpListenerRequest req)
 
 	private async Task BridgeConnection(TcpClient client, int targetPort, CancellationToken token)
 	{
-		_ = 5;
 		try
 		{
 			using (client)
@@ -786,12 +773,19 @@ private bool ValidateAuth(HttpListenerRequest req)
 				await target.ConnectAsync(IPAddress.Loopback, targetPort, token);
 				using NetworkStream clientStream = client.GetStream();
 				using NetworkStream targetStream = target.GetStream();
-				byte[] buf = new byte[8192];
-				int read = await clientStream.ReadAsync(buf, 0, buf.Length, token);
-				if (read > 0)
+
+				// Accumulate data until the end of HTTP headers (\r\n\r\n) is found
+				byte[] buf = new byte[16384];
+				int totalRead = 0;
+				int headerEnd = -1;
+
+				while (totalRead < buf.Length)
 				{
-					int headerEnd = -1;
-					for (int i = 0; i < read - 3; i++)
+					int read = await clientStream.ReadAsync(buf, totalRead, buf.Length - totalRead, token);
+					if (read <= 0) break;
+					totalRead += read;
+
+					for (int i = 0; i < totalRead - 3; i++)
 					{
 						if (buf[i] == 13 && buf[i + 1] == 10 && buf[i + 2] == 13 && buf[i + 3] == 10)
 						{
@@ -799,27 +793,52 @@ private bool ValidateAuth(HttpListenerRequest req)
 							break;
 						}
 					}
-					if (headerEnd <= 0)
+					if (headerEnd > 0) break;
+				}
+
+				if (headerEnd > 0)
+				{
+					string headerText = Encoding.UTF8.GetString(buf, 0, headerEnd);
+					string remoteIp = ((IPEndPoint?)client.Client.RemoteEndPoint)?.Address.ToString() ?? "127.0.0.1";
+
+					// 1. Rewrite Host header to targetPort so internal HttpListener doesn't reject with 400 Invalid Hostname
+					Match match = Regex.Match(headerText, @"Host:\s*[^\r\n]+", RegexOptions.IgnoreCase);
+					if (match.Success)
 					{
-						await targetStream.WriteAsync(buf, 0, read, token);
+						headerText = headerText.Substring(0, match.Index) +
+							$"Host: 127.0.0.1:{targetPort}\r\nX-Forwarded-For: {remoteIp}" +
+							headerText.Substring(match.Index + match.Length);
 					}
 					else
 					{
-						string text = Encoding.UTF8.GetString(buf, 0, headerEnd);
-						string value = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
-						Match match = Regex.Match(text, "Host:\\s*[^\\r\\n]+", RegexOptions.IgnoreCase);
-						if (match.Success)
-						{
-							text = text.Substring(0, match.Index) + $"Host: 127.0.0.1:{targetPort}\r\nX-Forwarded-For: {value}" + text.Substring(match.Index + match.Length);
-						}
-						byte[] bytes = Encoding.UTF8.GetBytes(text);
-						await targetStream.WriteAsync(bytes, 0, bytes.Length, token);
-						if (read > headerEnd)
-						{
-							await targetStream.WriteAsync(buf, headerEnd, read - headerEnd, token);
-						}
+						headerText = $"Host: 127.0.0.1:{targetPort}\r\nX-Forwarded-For: {remoteIp}\r\n" + headerText;
+					}
+
+					// 2. Force Connection: close so the internal listener closes the connection after replying.
+					// This ensures persistent Keep-Alive connections from mobile don't send subsequent requests without Host rewriting!
+					if (Regex.IsMatch(headerText, @"Connection:\s*[^\r\n]+", RegexOptions.IgnoreCase))
+					{
+						headerText = Regex.Replace(headerText, @"Connection:\s*[^\r\n]+", "Connection: close", RegexOptions.IgnoreCase);
+					}
+					else
+					{
+						headerText = headerText.Replace("\r\n\r\n", "\r\nConnection: close\r\n\r\n");
+					}
+
+					byte[] headerBytes = Encoding.UTF8.GetBytes(headerText);
+					await targetStream.WriteAsync(headerBytes, 0, headerBytes.Length, token);
+
+					// Forward any request body bytes that were already read in initial buffer
+					if (totalRead > headerEnd)
+					{
+						await targetStream.WriteAsync(buf, headerEnd, totalRead - headerEnd, token);
 					}
 				}
+				else if (totalRead > 0)
+				{
+					await targetStream.WriteAsync(buf, 0, totalRead, token);
+				}
+
 				Task task = clientStream.CopyToAsync(targetStream, token);
 				Task task2 = targetStream.CopyToAsync(clientStream, token);
 				await Task.WhenAny(task, task2);
@@ -1767,15 +1786,18 @@ private bool ValidateAuth(HttpListenerRequest req)
 			int discoveryPort = _settings.DiscoveryPort;
 			string value = $"PC Master Hub TCP ({httpPort})";
 			string value2 = $"PC Master Hub UDP ({discoveryPort})";
-			string text = $"netsh advfirewall firewall add rule name=\"{value}\" dir=in action=allow protocol=TCP localport={httpPort} & netsh advfirewall firewall add rule name=\"{value2}\" dir=in action=allow protocol=UDP localport={discoveryPort}";
+			string text = $"netsh advfirewall firewall add rule name=\"{value}\" dir=in action=allow protocol=TCP localport={httpPort} & " +
+			              $"netsh advfirewall firewall add rule name=\"{value2}\" dir=in action=allow protocol=UDP localport={discoveryPort} & " +
+			              $"netsh http add urlacl url=http://*:{httpPort}/ sddl=\"D:(A;;GX;;;WD)\" & " +
+			              $"netsh http add urlacl url=http://+:{httpPort}/ sddl=\"D:(A;;GX;;;WD)\"";
 			Process.Start(new ProcessStartInfo("cmd.exe", "/c " + text)
 			{
 				Verb = "runas",
 				CreateNoWindow = true,
 				UseShellExecute = true
 			});
-			AddToLog($"Firewall Rules: Adding TCP {httpPort} and UDP {discoveryPort}...");
-			System.Windows.MessageBox.Show("Attempting to add firewall rules. Please click 'Yes' on the administrator prompt.", "Firewall Setup");
+			AddToLog($"Firewall & URL Rules: Adding TCP {httpPort}, UDP {discoveryPort}, and HTTP.SYS URL ACL...");
+			System.Windows.MessageBox.Show("Attempting to add firewall rules and URL reservations. Please click 'Yes' on the administrator prompt.", "Firewall Setup");
 		}
 		catch (Exception ex)
 		{
@@ -2640,7 +2662,7 @@ var value2 = new
 				{
 					authToken = _settings.AuthToken,
 					requireAuth = _settings.RequireAuth,
-					version = "2.5.2",
+					version = "2.5.3",
 					compactMode = _settings.CompactMode,
 					ip = ip,
 					port = _settings.HttpPort,

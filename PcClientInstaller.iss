@@ -1,6 +1,6 @@
 [Setup]
 AppName=PC Master Control Center
-AppVersion=2.5.0 Pro
+AppVersion=2.5.3 Pro
 AppPublisher=Beyond Edge & PC Master Team
 DefaultDirName={autopf}\PcMasterControl
 DefaultGroupName=PC Master Control Center

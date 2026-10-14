@@ -46,3 +46,6 @@ test_live_frame.jpg
 blogger_pc_master_updated.html
 release_standalone/
 release_temp/
+_*.ps1
+_*.txt
+
